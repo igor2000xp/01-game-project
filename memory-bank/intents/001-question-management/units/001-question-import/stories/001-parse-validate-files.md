@@ -2,11 +2,12 @@
 id: 001-parse-validate-files
 unit: 001-question-import
 intent: 001-question-management
-status: draft
+status: complete
 priority: must
 created: 2026-02-19T15:24:31Z
-assigned_bolt: null
-implemented: false
+assigned_bolt: 001-question-import
+implemented: true
+completed: 2026-02-19T19:00:00Z
 ---
 
 # Story: 001-parse-validate-files

@@ -3,8 +3,14 @@ id: 002-question-crud
 unit: 002-question-crud
 intent: 001-question-management
 type: ddd-construction-bolt
-status: planned
-created: 2026-02-19T15:31:17Z
+status: in-progress
+started: 2026-02-19T19:10:00Z
+created: 2026-02-19T15:19:25Z
+current_stage: domain-model
+stages_completed:
+  - name: domain-model
+    completed: 2026-02-19T19:10:00Z
+    artifact: ddd-01-domain-model.md
 ---
 
 # Bolt: 002-question-crud
@@ -23,7 +29,7 @@ Implement core CRUD operations for questions including domain entities, service 
 
 ## Expected Outputs
 
-- Question domain entities (Question, QuestionFilter)
+- Question domain entities (Question, Category, QuestionFilter)
 - Question repository with TypeORM
 - Question service with business logic
 - Question controller with API endpoints
@@ -31,11 +37,14 @@ Implement core CRUD operations for questions including domain entities, service 
 ## Dependencies
 
 ### Requires Bolts
+
 None (independent bolt)
 
 ### Enables Bolts
-- 004-question-export (questions can be exported)
-- 003-category-service (questions reference categories)
+
+- 001-question-management-ui (Frontend uses CRUD endpoints)
+- 003-category-service (Questions reference categories)
+- 004-question-export (Questions can be exported)
 
 ## Complexity Assessment
 
@@ -43,11 +52,17 @@ None (independent bolt)
 |---------|--------|
 | Complexity | Medium (2) |
 | Uncertainty | Low (1) |
-| Dependencies | 1 (003-category-service) |
+| Dependencies | None (0) |
 | Testing | Unit + Integration (2) |
 
 ---
 
 ## Notes
 
-Ensure category is optional in question entity. Consider adding soft delete with is_deleted flag instead of hard delete for better data integrity.
+Category relationship should be optional (questions can exist without categories). Use soft delete for questions to preserve data integrity with evaluation references.
+
+Consider adding question metadata tracking (created_at, updated_at) for audit purposes.
+
+Use pagination for list questions to handle large datasets efficiently.
+
+Implement category service (003-category-service) separately to handle category CRUD operations.
