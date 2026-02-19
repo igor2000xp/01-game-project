@@ -4,6 +4,14 @@ import { Repository } from 'typeorm';
 import { Category } from '../entities/category.entity';
 import { Question } from '../entities/question.entity';
 
+export interface CategoryWithCount {
+  id: string;
+  name: string;
+  created_at: Date;
+  updated_at: Date;
+  question_count: number;
+}
+
 @Injectable()
 export class CategoryRepository {
   constructor(
@@ -17,8 +25,29 @@ export class CategoryRepository {
     return this.categoryRepo.save(data);
   }
 
+  async save(category: Category): Promise<Category> {
+    return this.categoryRepo.save(category);
+  }
+
   async findAll(): Promise<Category[]> {
     return this.categoryRepo.find();
+  }
+
+  async findAllWithCounts(): Promise<CategoryWithCount[]> {
+    return this.categoryRepo
+      .createQueryBuilder('category')
+      .leftJoin('category.questions', 'question', 'question.is_deleted = :isDeleted')
+      .setParameter('isDeleted', false)
+      .select([
+        'category.id',
+        'category.name',
+        'category.created_at',
+        'category.updated_at',
+        'COUNT(question.id) as question_count',
+      ])
+      .groupBy('category.id')
+      .orderBy('category.name', 'ASC')
+      .getRawMany();
   }
 
   async findById(id: string): Promise<Category | null> {

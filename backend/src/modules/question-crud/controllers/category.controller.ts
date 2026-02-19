@@ -10,15 +10,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { CategoryService } from '../services/category.service';
-import { CategoryDto } from '../dto/category.dto';
-
-export interface CreateCategoryDto {
-  name: string;
-}
-
-export interface UpdateCategoryDto {
-  name?: string;
-}
+import { CategoryDto, CreateCategoryDto, UpdateCategoryDto, CategoryListWithCountDto } from '../dto/category.dto';
 
 @Controller('categories')
 export class CategoryController {
@@ -41,6 +33,15 @@ export class CategoryController {
   @Get()
   async findAll(): Promise<CategoryDto[]> {
     return this.categoryService.findAll();
+  }
+
+  /**
+   * Get all categories with question counts
+   * GET /categories/with-counts
+   */
+  @Get('with-counts')
+  async findAllWithCounts(): Promise<CategoryListWithCountDto> {
+    return this.categoryService.findAllWithCounts();
   }
 
   /**

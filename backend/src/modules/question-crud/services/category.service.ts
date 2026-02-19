@@ -1,14 +1,11 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Category } from '../entities/category.entity';
-import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
+import { CategoryRepository } from '../repositories/category.repository';
+import { CategoryDto, CreateCategoryDto, UpdateCategoryDto, CategoryWithCountDto, CategoryListWithCountDto } from '../dto/category.dto';
 
 @Injectable()
 export class CategoryService {
   constructor(
-    @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
+    private categoryRepository: CategoryRepository,
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<CategoryDto> {
@@ -18,30 +15,38 @@ export class CategoryService {
     }
 
     // Create category entity
-    const category = this.categoryRepository.create({
+    const category = await this.categoryRepository.create({
       name: createCategoryDto.name,
       created_at: new Date(),
       updated_at: new Date(),
     });
 
-    await this.categoryRepository.save(category);
-
     return this.toDto(category);
   }
 
   async findAll(): Promise<CategoryDto[]> {
-    const categories = await this.categoryRepository.find({
-      select: ['id', 'name', 'created_at', 'updated_at'],
-    });
+    const categories = await this.categoryRepository.findAll();
 
     return categories.map(c => this.toDto(c));
   }
 
+  async findAllWithCounts(): Promise<CategoryListWithCountDto> {
+    const categoriesWithCounts = await this.categoryRepository.findAllWithCounts();
+
+    return {
+      data: categoriesWithCounts.map(c => ({
+        id: c.id,
+        name: c.name,
+        created_at: new Date(c.created_at),
+        updated_at: new Date(c.updated_at),
+        question_count: parseInt(String(c.question_count)),
+      })),
+      total: categoriesWithCounts.length,
+    };
+  }
+
   async findOne(id: string): Promise<CategoryDto> {
-    const category = await this.categoryRepository.findOne({
-      where: { id },
-      select: ['id', 'name', 'created_at', 'updated_at'],
-    });
+    const category = await this.categoryRepository.findById(id);
 
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
@@ -51,9 +56,7 @@ export class CategoryService {
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<CategoryDto> {
-    const category = await this.categoryRepository.findOne({
-      where: { id },
-    });
+    const category = await this.categoryRepository.findById(id);
 
     if (!category) {
       throw new NotFoundException(`Category with ID ${id} not found`);
@@ -68,25 +71,17 @@ export class CategoryService {
 
     category.updated_at = new Date();
 
-    await this.categoryRepository.save(category);
+    const saved = await this.categoryRepository.create(category);
 
-    return this.toDto(category);
+    return this.toDto(saved);
   }
 
   async delete(id: string): Promise<void> {
-    const category = await this.categoryRepository.findOne({
-      where: { id },
-    });
-
-    if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
-    }
-
     await this.categoryRepository.delete(id);
   }
 
   // Helper methods
-  private toDto(category: Category): CategoryDto {
+  private toDto(category: any): CategoryDto {
     return {
       id: category.id,
       name: category.name,

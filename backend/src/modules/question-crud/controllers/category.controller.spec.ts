@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoryController } from './category.controller';
 import { CategoryService } from '../services/category.service';
-import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
+import { CategoryDto, CreateCategoryDto, UpdateCategoryDto, CategoryWithCountDto, CategoryListWithCountDto } from '../dto/category.dto';
 
 describe('CategoryController', () => {
   let controller: CategoryController;
@@ -10,6 +10,7 @@ describe('CategoryController', () => {
   const mockCategoryService = {
     create: jest.fn(),
     findAll: jest.fn(),
+    findAllWithCounts: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
@@ -82,6 +83,54 @@ describe('CategoryController', () => {
       expect(result).toEqual(expected);
       expect(result).toHaveLength(2);
       expect(service.findAll).toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /categories/with-counts', () => {
+    it('should return categories with question counts', async () => {
+      const expected: CategoryListWithCountDto = {
+        data: [
+          {
+            id: 'cat-1',
+            name: 'Geography',
+            created_at: new Date(),
+            updated_at: new Date(),
+            question_count: 15,
+          },
+          {
+            id: 'cat-2',
+            name: 'Math',
+            created_at: new Date(),
+            updated_at: new Date(),
+            question_count: 8,
+          },
+        ],
+        total: 2,
+      };
+
+      mockCategoryService.findAllWithCounts.mockResolvedValue(expected);
+
+      const result = await controller.findAllWithCounts();
+
+      expect(result).toEqual(expected);
+      expect(result.data).toHaveLength(2);
+      expect(result.total).toBe(2);
+      expect(result.data[0].question_count).toBe(15);
+      expect(service.findAllWithCounts).toHaveBeenCalled();
+    });
+
+    it('should handle empty category list', async () => {
+      const expected: CategoryListWithCountDto = {
+        data: [],
+        total: 0,
+      };
+
+      mockCategoryService.findAllWithCounts.mockResolvedValue(expected);
+
+      const result = await controller.findAllWithCounts();
+
+      expect(result.data).toHaveLength(0);
+      expect(result.total).toBe(0);
     });
   });
 
