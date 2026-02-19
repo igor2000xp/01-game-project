@@ -7,7 +7,11 @@
       "Bash(npm test)",
       "Bash(npm run test:e2e:*)",
       "Bash(node:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout:*)",
+      "Bash(fi)",
+      "Bash(done)"
     ]
   }
 }

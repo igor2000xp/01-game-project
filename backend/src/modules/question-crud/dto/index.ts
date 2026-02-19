@@ -8,3 +8,5 @@ export * from './delete-category.dto';
 export * from './bulk-delete-questions.dto';
 export * from './bulk-delete-result.dto';
 export * from './category.dto';
+export * from './export-request.dto';
+export * from './export-result.dto';

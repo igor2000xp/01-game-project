@@ -151,6 +151,25 @@ export class QuestionRepository {
     return await this.questionRepo.count({ where: { is_deleted: false } });
   }
 
+  async getQuestionsForExport(options: {
+    category_id?: string;
+    include_deleted?: boolean;
+  }): Promise<Question[]> {
+    const where: any = {};
+    if (options.category_id) {
+      where.category_id = options.category_id;
+    }
+    if (options.include_deleted !== true) {
+      where.is_deleted = false;
+    }
+
+    return this.questionRepo.find({
+      where,
+      select: ['id', 'question_text', 'reference_answer', 'category_id', 'created_at', 'updated_at'],
+      order: { created_at: 'ASC' },
+    });
+  }
+
   async bulkSoftDelete(ids: string[], mode: DeleteMode): Promise<BulkDeleteResultDto> {
     return await this.questionRepo.manager.transaction(async (transactionalEntityManager) => {
       // Find all questions
