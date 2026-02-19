@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(nest:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm test)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(node:*)",
+      "Bash(npm test:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout:*)",
+      "Bash(fi)",
+      "Bash(done)"
+    ]
+  }
+}
