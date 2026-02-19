@@ -81,7 +81,10 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^uuid$": "<rootDir>/../node_modules/uuid/dist/index.js"
-    }
+      "^uuid$": "uuid"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!uuid)/"
+    ]
   }
 }

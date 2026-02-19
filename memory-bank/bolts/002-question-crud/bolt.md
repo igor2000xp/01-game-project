@@ -6,11 +6,18 @@ type: ddd-construction-bolt
 status: in-progress
 started: 2026-02-19T19:10:00Z
 created: 2026-02-19T15:19:25Z
-current_stage: domain-model
+current_stage: implement
 stages_completed:
   - name: domain-model
     completed: 2026-02-19T19:10:00Z
     artifact: ddd-01-domain-model.md
+  - name: technical-design
+    completed: 2026-02-19T15:00Z
+    artifact: ddd-02-technical-design.md
+  - name: adr-analysis
+    completed: 2026-02-19T15:00Z
+    artifacts:
+      - adr-001-fulltext-search-fs5.md
 ---
 
 # Bolt: 002-question-crud
@@ -21,11 +28,11 @@ Implement core CRUD operations for questions including domain entities, service 
 
 ## Stories Included
 
-- [ ] 001-create-question: Create new question - Priority: Must
-- [ ] 002-list-questions: List questions with pagination - Priority: Must
-- [ ] 003-update-question: Update existing question - Priority: Should
-- [ ] 004-delete-question: Delete single question - Priority: Should
-- [ ] 005-bulk-delete: Bulk delete questions by category - Priority: Could
+- [x] 001-create-question: Create new question - Priority: Must
+- [x] 002-list-questions: List questions with pagination - Priority: Must
+- [x] 003-update-question: Update existing question - Priority: Should
+- [x] 004-delete-question: Delete single question - Priority: Should
+- [x] 005-bulk-delete: Bulk delete questions by category - Priority: Could
 
 ## Expected Outputs
 
@@ -60,8 +67,6 @@ None (independent bolt)
 ## Notes
 
 Category relationship should be optional (questions can exist without categories). Use soft delete for questions to preserve data integrity with evaluation references.
-
-Consider adding question metadata tracking (created_at, updated_at) for audit purposes.
 
 Use pagination for list questions to handle large datasets efficiently.
 
