@@ -1,0 +1,9 @@
+{
+  "data": [
+    { "id": 1, "text": "What is 2+2?", "categoryId": 1, "category": { "id": 1, "name": "Math" } },
+    { "id": 2, "text": "What is the capital of France?", "categoryId": 2, "category": { "id": 2, "name": "Geography" } }
+  ],
+  "total": 2,
+  "page": 1,
+  "pageSize": 10
+}

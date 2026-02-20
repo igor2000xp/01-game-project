@@ -1,7 +1,7 @@
-<div class="category-list">
+<div class="category-list" data-cy="category-list">
   <div class="category-header">
     <h2>Categories</h2>
-    <button class="btn btn-primary" (click)="create.emit()">+ Add Category</button>
+    <button class="btn btn-primary" (click)="create.emit()" data-cy="add-category-button">+ Add Category</button>
   </div>
 
   @if (categories().length === 0) {
@@ -12,7 +12,7 @@
   } @else {
     <div class="category-items">
       @for (category of categories(); track category.id) {
-        <div class="category-item">
+        <div class="category-item" data-cy="category-item">
           <div class="category-info">
             <h3>{{ category.name }}</h3>
             @if (category.question_count !== undefined) {

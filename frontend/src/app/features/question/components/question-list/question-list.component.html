@@ -1,4 +1,4 @@
-<div class="question-list">
+<div class="question-list" data-cy="question-list">
   <table class="questions-table">
     <thead>
       <tr>
@@ -17,7 +17,7 @@
         </tr>
       } @else {
         @for (question of questions(); track question.id) {
-          <tr>
+          <tr data-cy="question-item">
             <td class="question-text">{{ question.text }}</td>
             <td>
               <span class="badge type-badge">
@@ -37,6 +37,7 @@
             <td class="actions">
               <button
                 class="action-btn edit-btn"
+                data-cy="edit-button"
                 (click)="edit.emit(question.id)"
                 title="Edit"
               >
@@ -44,6 +45,7 @@
               </button>
               <button
                 class="action-btn delete-btn"
+                data-cy="delete-button"
                 (click)="delete.emit(question.id)"
                 title="Delete"
               >
@@ -57,7 +59,7 @@
   </table>
 
   @if (totalPages() > 1) {
-    <div class="pagination">
+    <div class="pagination" data-cy="pagination">
       <button
         class="page-btn"
         [disabled]="currentPage() === 1"

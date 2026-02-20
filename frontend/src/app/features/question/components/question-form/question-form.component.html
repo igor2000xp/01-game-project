@@ -1,4 +1,4 @@
-<div class="question-form">
+<div class="question-form" data-cy="question-form">
   <h2>{{ isEditMode() ? 'Edit Question' : 'Create Question' }}</h2>
 
   <form (ngSubmit)="onSubmit()">
@@ -6,6 +6,7 @@
       <label for="question-text">Question Text *</label>
       <textarea
         id="question-text"
+        data-cy="question-text"
         rows="3"
         [value]="formData().text"
         (input)="onTextInput($event)"
@@ -85,6 +86,7 @@
       <label for="question-category">Category</label>
       <select
         id="question-category"
+        data-cy="category-select"
         [value]="formData().category_id"
         (change)="onCategorySelect($event)"
       >

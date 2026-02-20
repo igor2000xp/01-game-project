@@ -1,7 +1,7 @@
 @if (hasNotifications()) {
   <div class="notification-container">
     @for (notification of notifications(); track notification.id) {
-      <div class="notification {{ getTypeClass(notification.type) }}">
+      <div class="notification {{ getTypeClass(notification.type) }}" data-cy="notification">
         <span class="notification-icon">{{ getIcon(notification.type) }}</span>
         <span class="notification-message">{{ notification.message }}</span>
         <button class="notification-close" (click)="dismiss(notification.id)">×</button>

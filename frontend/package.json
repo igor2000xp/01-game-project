@@ -6,7 +6,15 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "vitest",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:component": "cypress run --component",
+    "test:component:watch": "cypress open --component",
+    "test:e2e": "cypress run --e2e",
+    "test:e2e:watch": "cypress open --e2e",
+    "test:e2e:feature": "cypress run --e2e --spec 'cypress/e2e/features/**/*.feature'",
+    "test:all": "npm run test:unit && npm run test:component && npm run test:e2e"
   },
   "prettier": {
     "printWidth": 100,
@@ -36,6 +44,11 @@
     "@angular/build": "^21.0.5",
     "@angular/cli": "^21.0.5",
     "@angular/compiler-cli": "^21.0.0",
+    "@badeball/cypress-cucumber-preprocessor": "^24.0.1",
+    "@cypress/webpack-dev-server": "^5.6.0",
+    "@cypress/webpack-preprocessor": "^7.0.2",
+    "@percy/cypress": "^3.1.7",
+    "cypress": "^15.10.0",
     "typescript": "~5.9.2"
   }
 }

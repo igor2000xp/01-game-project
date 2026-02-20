@@ -1,4 +1,4 @@
-<div class="category-form">
+<div class="category-form" data-cy="category-form">
   <h2>{{ isEditMode() ? 'Edit Category' : 'Create Category' }}</h2>
 
   <form (ngSubmit)="onSubmit()">
@@ -6,6 +6,7 @@
       <label for="category-name">Category Name *</label>
       <input
         id="category-name"
+        data-cy="category-name"
         type="text"
         [value]="formData().name"
         (input)="onNameInput($event)"

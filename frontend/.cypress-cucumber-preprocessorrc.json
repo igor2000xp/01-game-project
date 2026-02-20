@@ -1,0 +1,7 @@
+{
+  "stepDefinitions": "cypress/e2e/step_definitions/**/*.ts",
+  "stepDefinitionPatterns": ["cypress/e2e/step_definitions/**/*.ts"],
+  "specPatterns": ["cypress/e2e/features/**/*.feature"],
+  "filterSpecs": true,
+  "omitFiltered": true
+}
