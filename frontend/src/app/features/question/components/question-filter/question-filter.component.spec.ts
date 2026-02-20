@@ -36,6 +36,10 @@ describe('QuestionFilterComponent', () => {
 
   it('emits categoryChange when category selection changes', () => {
     const categorySpy = vi.spyOn(component.categoryChange, 'emit');
+    fixture.componentRef.setInput('categories', [
+      { id: 'cat-1', name: 'Geography', question_count: 3 },
+    ]);
+    fixture.detectChanges();
     const select = fixture.debugElement.query(By.css('#category-select'))
       .nativeElement as HTMLSelectElement;
 
@@ -56,6 +60,16 @@ describe('QuestionFilterComponent', () => {
     fixture.detectChanges();
 
     expect(fixture.debugElement.query(By.css('.clear-btn'))).toBeTruthy();
+  });
+
+  it('emits clearFilters when clear button is clicked', () => {
+    const clearSpy = vi.spyOn(component.clearFilters, 'emit');
+    fixture.componentRef.setInput('searchQuery', 'math');
+    fixture.detectChanges();
+
+    (fixture.debugElement.query(By.css('.clear-btn')).nativeElement as HTMLButtonElement).click();
+
+    expect(clearSpy).toHaveBeenCalled();
   });
 
   it('renders category options from input categories', () => {

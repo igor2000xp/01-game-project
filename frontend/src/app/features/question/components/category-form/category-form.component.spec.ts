@@ -33,10 +33,22 @@ describe('CategoryFormComponent', () => {
     input.value = 'Science';
     input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
-    (fixture.debugElement.query(By.css('form')).nativeElement as HTMLFormElement).dispatchEvent(
-      new Event('submit')
-    );
+    component.onSubmit();
 
     expect(submitSpy).toHaveBeenCalledWith({ name: 'Science' });
+  });
+
+  it('does not emit submit when category name is blank', () => {
+    const submitSpy = vi.spyOn(component.submit, 'emit');
+    const input = fixture.debugElement.query(By.css('#category-name'))
+      .nativeElement as HTMLInputElement;
+
+    input.value = '   ';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    component.onSubmit();
+
+    expect(submitSpy).not.toHaveBeenCalled();
   });
 });

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, signal, input } from '@angular/core';
+import { Component, Output, EventEmitter, signal, Input } from '@angular/core';
 
 export type FileUploadEvent = {
   file: File;
@@ -14,7 +14,16 @@ export class FileUploadComponent {
   @Output() fileSelected = new EventEmitter<FileUploadEvent>();
   @Output() fileUpload = new EventEmitter<FileUploadEvent>();
 
-  maxFileSize = input.required<number>();
+  private readonly _maxFileSize = signal(0);
+
+  @Input('maxFileSize')
+  set maxFileSizeInput(value: number) {
+    this._maxFileSize.set(value);
+  }
+
+  maxFileSize(): number {
+    return this._maxFileSize();
+  }
 
   isDragging = signal(false);
   errorMessage = signal('');

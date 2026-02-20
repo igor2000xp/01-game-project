@@ -1,4 +1,4 @@
-import { Component, OnInit, input, output, computed } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, computed, signal } from '@angular/core';
 import { Question, Category } from '../../models/question.model';
 
 @Component({
@@ -8,16 +8,61 @@ import { Question, Category } from '../../models/question.model';
   styleUrl: './question-list.component.css',
 })
 export class QuestionListComponent implements OnInit {
-  questions = input.required<Question[]>();
-  total = input.required<number>();
-  categories = input<Category[]>([]);
+  private readonly _questions = signal<Question[]>([]);
+  private readonly _total = signal(0);
+  private readonly _categories = signal<Category[]>([]);
 
-  currentPage = input<number>(1);
-  pageSize = input<number>(20);
+  private readonly _currentPage = signal(1);
+  private readonly _pageSize = signal(20);
 
-  edit = output<string>();
-  delete = output<string>();
-  pageChange = output<number>();
+  @Input('questions')
+  set questionsInput(value: Question[]) {
+    this._questions.set(value);
+  }
+
+  questions(): Question[] {
+    return this._questions();
+  }
+
+  @Input('total')
+  set totalInput(value: number) {
+    this._total.set(value);
+  }
+
+  total(): number {
+    return this._total();
+  }
+
+  @Input('categories')
+  set categoriesInput(value: Category[] | undefined) {
+    this._categories.set(value ?? []);
+  }
+
+  categories(): Category[] {
+    return this._categories();
+  }
+
+  @Input('currentPage')
+  set currentPageInput(value: number | undefined) {
+    this._currentPage.set(value ?? 1);
+  }
+
+  currentPage(): number {
+    return this._currentPage();
+  }
+
+  @Input('pageSize')
+  set pageSizeInput(value: number | undefined) {
+    this._pageSize.set(value ?? 20);
+  }
+
+  pageSize(): number {
+    return this._pageSize();
+  }
+
+  @Output() edit = new EventEmitter<string>();
+  @Output() delete = new EventEmitter<string>();
+  @Output() pageChange = new EventEmitter<number>();
 
   readonly questionTypes: Record<Question['type'], string> = {
     'multiple-choice': 'MC',

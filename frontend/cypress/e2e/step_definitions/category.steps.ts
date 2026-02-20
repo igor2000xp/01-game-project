@@ -49,9 +49,7 @@ Then('the category list includes {string}', (text: string) => {
 });
 
 When('I delete the first category in the list', () => {
-  cy.intercept('DELETE', '**/api/categories/*', { statusCode: 200, body: {} }).as(
-    'deleteCategory'
-  );
+  cy.intercept('DELETE', '**/api/categories/*', { statusCode: 200, body: {} }).as('deleteCategory');
   cy.get('[data-cy="category-item"]').first().find('.delete-btn').click();
   cy.wait('@deleteCategory');
 });

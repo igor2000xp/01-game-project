@@ -1,4 +1,4 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, computed, Input, signal } from '@angular/core';
 import { ImportProgress, ImportError } from '../../models/import.model';
 
 @Component({
@@ -8,7 +8,20 @@ import { ImportProgress, ImportError } from '../../models/import.model';
   styleUrl: './import-progress.component.css',
 })
 export class ImportProgressComponent {
-  progress = input.required<ImportProgress>();
+  private readonly _progress = signal<ImportProgress | null>(null);
+
+  @Input('progress')
+  set progressInput(value: ImportProgress) {
+    this._progress.set(value);
+  }
+
+  progress(): ImportProgress {
+    const progress = this._progress();
+    if (!progress) {
+      throw new Error('Progress is required');
+    }
+    return progress;
+  }
 
   readonly progressPercent = computed(() => {
     const total = this.progress().total;

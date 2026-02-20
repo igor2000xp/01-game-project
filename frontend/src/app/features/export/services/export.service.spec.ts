@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { describe, beforeEach, afterEach, it, expect, vi } from 'vitest';
+import { firstValueFrom } from 'rxjs';
 import { ExportService } from './export.service';
 
 describe('ExportService', () => {
@@ -21,13 +22,16 @@ describe('ExportService', () => {
     vi.restoreAllMocks();
   });
 
-  it('posts export request and expects blob response', () => {
-    service.exportQuestions({ format: 'csv' }).subscribe();
+  it('posts export request and expects blob response', async () => {
+    const resultPromise = firstValueFrom(service.exportQuestions({ format: 'csv' }));
 
     const req = httpMock.expectOne('/questions/export');
     expect(req.request.method).toBe('POST');
     expect(req.request.responseType).toBe('blob');
-    req.flush(new Blob(['csv,data'], { type: 'text/csv' }));
+    const blob = new Blob(['csv,data'], { type: 'text/csv' });
+    req.flush(blob);
+
+    await expect(resultPromise).resolves.toEqual(blob);
   });
 
   it('downloads blob using object URL and temporary anchor', () => {
@@ -43,8 +47,11 @@ describe('ExportService', () => {
   });
 
   it('generates timestamped filenames with selected format', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-02-20T12:34:56.000Z'));
     const filename = service.generateFilename('json');
+    vi.useRealTimers();
 
-    expect(filename).toMatch(/questions-export-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json/);
+    expect(filename).toBe('questions-export-2026-02-20_12-34-56.json');
   });
 });

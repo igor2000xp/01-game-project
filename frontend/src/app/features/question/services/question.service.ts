@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import {
@@ -16,7 +16,7 @@ import {
   providedIn: 'root',
 })
 export class QuestionService {
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   // Question CRUD operations
 

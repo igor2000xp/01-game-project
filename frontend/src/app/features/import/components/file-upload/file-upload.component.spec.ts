@@ -6,6 +6,12 @@ import { FileUploadComponent } from './file-upload.component';
 describe('FileUploadComponent', () => {
   let component: FileUploadComponent;
   let fixture: ComponentFixture<FileUploadComponent>;
+  const createDropEvent = (file: File): DragEvent =>
+    ({
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      dataTransfer: { files: [file] },
+    }) as unknown as DragEvent;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -31,11 +37,7 @@ describe('FileUploadComponent', () => {
     const fileSelectedSpy = vi.spyOn(component.fileSelected, 'emit');
     const fileUploadSpy = vi.spyOn(component.fileUpload, 'emit');
 
-    component.onDrop({
-      preventDefault: vi.fn(),
-      stopPropagation: vi.fn(),
-      dataTransfer: { files: [file] },
-    } as unknown as DragEvent);
+    component.onDrop(createDropEvent(file));
 
     expect(fileSelectedSpy).toHaveBeenCalledWith({ file });
     expect(fileUploadSpy).toHaveBeenCalledWith({ file });
@@ -48,11 +50,7 @@ describe('FileUploadComponent', () => {
     const file = new File(['long-content'], 'questions.csv', { type: 'text/csv' });
     const fileSelectedSpy = vi.spyOn(component.fileSelected, 'emit');
 
-    component.onDrop({
-      preventDefault: vi.fn(),
-      stopPropagation: vi.fn(),
-      dataTransfer: { files: [file] },
-    } as unknown as DragEvent);
+    component.onDrop(createDropEvent(file));
 
     expect(component.errorMessage()).toContain('exceeds');
     expect(fileSelectedSpy).not.toHaveBeenCalled();
@@ -61,11 +59,7 @@ describe('FileUploadComponent', () => {
   it('rejects unsupported file extensions', () => {
     const file = new File(['hello'], 'questions.txt', { type: 'text/plain' });
 
-    component.onDrop({
-      preventDefault: vi.fn(),
-      stopPropagation: vi.fn(),
-      dataTransfer: { files: [file] },
-    } as unknown as DragEvent);
+    component.onDrop(createDropEvent(file));
 
     expect(component.errorMessage()).toContain('CSV or JSON');
   });

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ImportSession, ImportProgress } from '../models/import.model';
@@ -7,7 +7,7 @@ import { ImportSession, ImportProgress } from '../models/import.model';
   providedIn: 'root',
 })
 export class ImportService {
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   uploadFile(file: File): Observable<{ session_id: string }> {
     const formData = new FormData();

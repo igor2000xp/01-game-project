@@ -1,4 +1,4 @@
-import { Component, input, output, computed } from '@angular/core';
+import { Component, computed, EventEmitter, Input, Output, signal } from '@angular/core';
 import { Category } from '../../models/question.model';
 
 @Component({
@@ -8,14 +8,50 @@ import { Category } from '../../models/question.model';
   styleUrl: './question-filter.component.css',
 })
 export class QuestionFilterComponent {
-  categories = input<Category[]>([]);
-  searchQuery = input<string>('');
-  selectedCategory = input<string>('');
-  showFilter = input<boolean>(true);
+  private readonly _categories = signal<Category[]>([]);
+  private readonly _searchQuery = signal('');
+  private readonly _selectedCategory = signal('');
+  private readonly _showFilter = signal(true);
 
-  searchChange = output<string>();
-  categoryChange = output<string>();
-  clearFilters = output<void>();
+  @Input('categories')
+  set categoriesInput(value: Category[] | undefined) {
+    this._categories.set(value ?? []);
+  }
+
+  categories(): Category[] {
+    return this._categories();
+  }
+
+  @Input('searchQuery')
+  set searchQueryInput(value: string | undefined) {
+    this._searchQuery.set(value ?? '');
+  }
+
+  searchQuery(): string {
+    return this._searchQuery();
+  }
+
+  @Input('selectedCategory')
+  set selectedCategoryInput(value: string | undefined) {
+    this._selectedCategory.set(value ?? '');
+  }
+
+  selectedCategory(): string {
+    return this._selectedCategory();
+  }
+
+  @Input('showFilter')
+  set showFilterInput(value: boolean | undefined) {
+    this._showFilter.set(value ?? true);
+  }
+
+  showFilter(): boolean {
+    return this._showFilter();
+  }
+
+  @Output() searchChange = new EventEmitter<string>();
+  @Output() categoryChange = new EventEmitter<string>();
+  @Output() clearFilters = new EventEmitter<void>();
 
   readonly hasActiveFilters = computed(() => {
     return this.searchQuery().length > 0 || this.selectedCategory().length > 0;

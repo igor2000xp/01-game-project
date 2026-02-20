@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "test": "npm --prefix backend run test && npm --prefix frontend run test",
     "typecheck": "npm --prefix frontend run typecheck && npm --prefix backend run typecheck"
   },
   "dependencies": {

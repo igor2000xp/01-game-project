@@ -6,6 +6,7 @@ import { QuestionService } from '../../services/question.service';
 import { ImportService } from '../../../import/services/import.service';
 import { ExportService } from '../../../export/services/export.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
+import { Category, Question } from '../../models/question.model';
 
 describe('QuestionManagementPage (integration)', () => {
   let fixture: ComponentFixture<QuestionManagementPage>;
@@ -42,11 +43,9 @@ describe('QuestionManagementPage (integration)', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     questionServiceMock.getQuestions.mockReturnValue(
-      of({ data: [{ id: 'q1', text: 'Q1' }], total: 1, page: 1, limit: 20 })
+      of({ data: [makeQuestion()], total: 1, page: 1, limit: 20 })
     );
-    questionServiceMock.getCategories.mockReturnValue(
-      of([{ id: 'cat-1', name: 'Math', question_count: 1 }])
-    );
+    questionServiceMock.getCategories.mockReturnValue(of([makeCategory()]));
     questionServiceMock.createQuestion.mockReturnValue(of({ id: 'q2' }));
     exportServiceMock.exportQuestions.mockReturnValue(of(new Blob(['data'])));
     exportServiceMock.generateFilename.mockReturnValue('questions-export.csv');
@@ -105,4 +104,25 @@ describe('QuestionManagementPage (integration)', () => {
       'questions-export.csv'
     );
   });
+});
+const makeQuestion = (overrides: Partial<Question> = {}): Question => ({
+  id: 'q1',
+  text: 'Q1',
+  answer: 'A1',
+  type: 'open-ended',
+  category_id: 'cat-1',
+  difficulty: 'easy',
+  is_deleted: false,
+  created_at: '2024-01-01T00:00:00.000Z',
+  updated_at: '2024-01-01T00:00:00.000Z',
+  ...overrides,
+});
+
+const makeCategory = (overrides: Partial<Category> = {}): Category => ({
+  id: 'cat-1',
+  name: 'Math',
+  question_count: 1,
+  created_at: '2024-01-01',
+  updated_at: '2024-01-01',
+  ...overrides,
 });

@@ -7,6 +7,12 @@ describe('QuestionFormComponent', () => {
   let component: QuestionFormComponent;
   let fixture: ComponentFixture<QuestionFormComponent>;
 
+  const setTextAreaValue = (selector: string, value: string): void => {
+    const input = fixture.debugElement.query(By.css(selector)).nativeElement as HTMLTextAreaElement;
+    input.value = value;
+    input.dispatchEvent(new Event('input'));
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [QuestionFormComponent],
@@ -22,15 +28,8 @@ describe('QuestionFormComponent', () => {
       .nativeElement as HTMLButtonElement;
     expect(submitButton.disabled).toBe(true);
 
-    const textInput = fixture.debugElement.query(By.css('#question-text'))
-      .nativeElement as HTMLTextAreaElement;
-    const answerInput = fixture.debugElement.query(By.css('#question-answer'))
-      .nativeElement as HTMLTextAreaElement;
-
-    textInput.value = 'What is 2 + 2?';
-    textInput.dispatchEvent(new Event('input'));
-    answerInput.value = '4';
-    answerInput.dispatchEvent(new Event('input'));
+    setTextAreaValue('#question-text', 'What is 2 + 2?');
+    setTextAreaValue('#question-answer', '4');
     fixture.detectChanges();
 
     expect(component.isFormValid()).toBe(true);
@@ -38,23 +37,22 @@ describe('QuestionFormComponent', () => {
 
   it('emits submit with form payload when valid form is submitted', () => {
     const submitSpy = vi.spyOn(component.submit, 'emit');
-    const textInput = fixture.debugElement.query(By.css('#question-text'))
-      .nativeElement as HTMLTextAreaElement;
-    const answerInput = fixture.debugElement.query(By.css('#question-answer'))
-      .nativeElement as HTMLTextAreaElement;
-
-    textInput.value = 'Capital of France?';
-    textInput.dispatchEvent(new Event('input'));
-    answerInput.value = 'Paris';
-    answerInput.dispatchEvent(new Event('input'));
+    setTextAreaValue('#question-text', 'Capital of France?');
+    setTextAreaValue('#question-answer', 'Paris');
     fixture.detectChanges();
 
-    (fixture.debugElement.query(By.css('form')).nativeElement as HTMLFormElement).dispatchEvent(
-      new Event('submit')
-    );
+    component.onSubmit();
 
     expect(submitSpy).toHaveBeenCalledWith(
       expect.objectContaining({ text: 'Capital of France?', answer: 'Paris' })
     );
+  });
+
+  it('does not emit submit when required fields are empty', () => {
+    const submitSpy = vi.spyOn(component.submit, 'emit');
+
+    component.onSubmit();
+
+    expect(submitSpy).not.toHaveBeenCalled();
   });
 });

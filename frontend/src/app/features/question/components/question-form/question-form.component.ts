@@ -1,4 +1,4 @@
-import { Component, input, output, signal, computed, effect } from '@angular/core';
+import { Component, signal, computed, effect, EventEmitter, Input, Output } from '@angular/core';
 import {
   Question,
   Category,
@@ -25,11 +25,29 @@ interface FormData {
   styleUrl: './question-form.component.css',
 })
 export class QuestionFormComponent {
-  question = input<Question | undefined>();
-  categories = input<Category[]>([]);
+  private readonly _question = signal<Question | undefined>(undefined);
+  private readonly _categories = signal<Category[]>([]);
 
-  submit = output<CreateQuestionDto | UpdateQuestionDto>();
-  cancel = output<void>();
+  @Input('question')
+  set questionInput(value: Question | undefined) {
+    this._question.set(value);
+  }
+
+  question(): Question | undefined {
+    return this._question();
+  }
+
+  @Input('categories')
+  set categoriesInput(value: Category[] | undefined) {
+    this._categories.set(value ?? []);
+  }
+
+  categories(): Category[] {
+    return this._categories();
+  }
+
+  @Output() submit = new EventEmitter<CreateQuestionDto | UpdateQuestionDto>();
+  @Output() cancel = new EventEmitter<void>();
 
   readonly isEditMode = computed(() => !!this.question());
 

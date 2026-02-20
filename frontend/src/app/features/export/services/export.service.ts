@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ExportRequest } from '../models/export.model';
@@ -7,7 +7,7 @@ import { ExportRequest } from '../models/export.model';
   providedIn: 'root',
 })
 export class ExportService {
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
 
   exportQuestions(request: ExportRequest): Observable<Blob> {
     return this.http.post('/questions/export', request, {
