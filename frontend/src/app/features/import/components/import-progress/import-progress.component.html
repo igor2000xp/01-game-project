@@ -1,0 +1,40 @@
+<div class="import-progress">
+  <div class="progress-header">
+    <span class="progress-status {{ statusClass() }}">{{ statusText() }}</span>
+    <span class="progress-count">{{ progress().processed }} / {{ progress().total }}</span>
+  </div>
+
+  <div class="progress-bar-container">
+    <div
+      class="progress-bar"
+      [style.width.%]="progressPercent()"
+    ></div>
+  </div>
+
+  @if (isComplete()) {
+    <div class="progress-summary">
+      <div class="summary-item success">
+        <span>✓</span> {{ progress().success }} successful
+      </div>
+      @if (progress().failed > 0) {
+        <div class="summary-item error">
+          <span>✕</span> {{ progress().failed }} failed
+        </div>
+      }
+    </div>
+  }
+
+  @if (hasErrors()) {
+    <div class="error-list">
+      <h4>Errors ({{ progress().errors.length }})</h4>
+      @for (error of progress().errors; track trackError($index, error)) {
+        <div class="error-item">
+          @if (error.row) {
+            <span class="error-row">Row {{ error.row }}:</span>
+          }
+          <span class="error-message">{{ error.message }}</span>
+        </div>
+      }
+    </div>
+  }
+</div>

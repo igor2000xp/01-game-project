@@ -1,0 +1,111 @@
+<div class="question-form">
+  <h2>{{ isEditMode() ? 'Edit Question' : 'Create Question' }}</h2>
+
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="question-text">Question Text *</label>
+      <textarea
+        id="question-text"
+        rows="3"
+        [value]="formData().text"
+        (input)="onTextInput($event)"
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="question-answer">Answer *</label>
+      <textarea
+        id="question-answer"
+        rows="2"
+        [value]="formData().answer"
+        (input)="onAnswerInput($event)"
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="question-type">Type *</label>
+        <select
+          id="question-type"
+          [value]="formData().type"
+          (change)="onTypeSelect($event)"
+        >
+          @for (type of availableTypes; track type) {
+            <option [value]="type">{{ type }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="question-difficulty">Difficulty</label>
+        <select
+          id="question-difficulty"
+          [value]="formData().difficulty"
+          (change)="onDifficultySelect($event)"
+        >
+          @for (difficulty of availableDifficulties; track difficulty) {
+            <option [value]="difficulty">{{ difficulty }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (isMultipleChoice()) {
+      <div class="form-group options-group">
+        <label>Options (at least 2)</label>
+        @for (option of formData().options; track option; let i = $index) {
+          <div class="option-input">
+            <span class="option-label">{{ i + 1 }}.</span>
+            <input
+              type="text"
+              [value]="option"
+              (input)="onOptionInput(i, $event)"
+              placeholder="Option {{ i + 1 }}"
+            />
+            @if (formData().options.length > 2) {
+              <button
+                type="button"
+                class="remove-option-btn"
+                (click)="removeOption(i)"
+              >×</button>
+            }
+          </div>
+        }
+        <button
+          type="button"
+          class="add-option-btn"
+          (click)="addOption()"
+        >+ Add Option</button>
+      </div>
+    }
+
+    <div class="form-group">
+      <label for="question-category">Category</label>
+      <select
+        id="question-category"
+        [value]="formData().category_id"
+        (change)="onCategorySelect($event)"
+      >
+        <option value="">No Category</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!isFormValid()"
+      >
+        {{ isEditMode() ? 'Update' : 'Create' }} Question
+      </button>
+    </div>
+  </form>
+</div>

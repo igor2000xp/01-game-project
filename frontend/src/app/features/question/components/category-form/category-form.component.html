@@ -1,0 +1,30 @@
+<div class="category-form">
+  <h2>{{ isEditMode() ? 'Edit Category' : 'Create Category' }}</h2>
+
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="category-name">Category Name *</label>
+      <input
+        id="category-name"
+        type="text"
+        [value]="formData().name"
+        (input)="onNameInput($event)"
+        placeholder="Enter category name"
+        required
+      />
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!isFormValid()"
+      >
+        {{ isEditMode() ? 'Update' : 'Create' }} Category
+      </button>
+    </div>
+  </form>
+</div>

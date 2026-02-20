@@ -1,0 +1,94 @@
+<div class="question-management">
+  <div class="page-header">
+    <h1>Question Management</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="onCreateQuestion()">+ Add Question</button>
+      <button class="btn btn-secondary" (click)="onToggleImport()">
+        📤 Import
+      </button>
+      <app-export-button (export)="onExport($event)" />
+    </div>
+  </div>
+
+  @if (showImport()) {
+    <div class="import-section">
+      <div class="section-header">
+        <h2>Import Questions</h2>
+        <button class="close-btn" (click)="onToggleImport()">×</button>
+      </div>
+
+      @if (!importProgress()) {
+        <app-file-upload [maxFileSize]="10 * 1024 * 1024" (fileUpload)="onFileUpload($event)" />
+      }
+
+      @if (importProgress()) {
+        <app-import-progress [progress]="importProgress()!" />
+      }
+    </div>
+  }
+
+  <div class="content-layout">
+    <div class="main-content">
+      <app-question-filter
+        [categories]="categories()"
+        [searchQuery]="searchQuery()"
+        [selectedCategory]="selectedCategory()"
+        [showFilter]="showFilter()"
+        (searchChange)="onSearchChange($event)"
+        (categoryChange)="onCategoryChange($event)"
+        (clearFilters)="onClearFilters()"
+      />
+
+      @if (isLoading()) {
+        <div class="loading-state">Loading questions...</div>
+      }
+
+      @if (!isLoading()) {
+        <app-question-list
+          [questions]="questions()"
+          [total]="totalQuestions()"
+          [categories]="categories()"
+          [currentPage]="currentPage()"
+          [pageSize]="pageSize()"
+          (edit)="onEditQuestion($event)"
+          (delete)="onDeleteQuestion($event)"
+          (pageChange)="onPageChange($event)"
+        />
+      }
+    </div>
+
+    <div class="sidebar">
+      <app-category-list
+        [categories]="categories()"
+        (create)="onCreateCategory()"
+        (edit)="onEditCategory($event)"
+        (delete)="onDeleteCategory($event)"
+      />
+    </div>
+  </div>
+
+  @if (showQuestionForm()) {
+    <div class="modal-overlay" (click)="onQuestionFormCancel()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <app-question-form
+          [question]="editingQuestion()"
+          [categories]="categories()"
+          (submit)="onQuestionSubmit($event)"
+          (cancel)="onQuestionFormCancel()"
+        />
+      </div>
+    </div>
+  }
+
+  @if (showCategoryForm()) {
+    <div class="modal-overlay" (click)="onCategoryFormCancel()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <app-category-form
+          [category]="editingCategory()"
+          (submit)="onCategorySubmit($event)"
+          (cancel)="onCategoryFormCancel()"
+        />
+      </div>
+    </div>
+  }
+</div>
