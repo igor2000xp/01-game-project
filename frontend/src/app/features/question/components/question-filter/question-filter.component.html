@@ -1,0 +1,39 @@
+@if (showFilter()) {
+  <div class="question-filter">
+    <div class="filter-group">
+      <label for="search-input">Search</label>
+      <input
+        id="search-input"
+        type="text"
+        class="search-input"
+        placeholder="Search questions..."
+        [value]="searchQuery()"
+        (input)="onSearchInput($event)"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label for="category-select">Category</label>
+      <select
+        id="category-select"
+        class="category-select"
+        [value]="selectedCategory()"
+        (change)="onCategorySelect($event)"
+      >
+        <option value="">All Categories</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">
+            {{ category.name }}
+            @if (category.question_count !== undefined) {
+              ({{ category.question_count }})
+            }
+          </option>
+        }
+      </select>
+    </div>
+
+    @if (hasActiveFilters()) {
+      <button class="clear-btn" (click)="onClearFilters()">Clear Filters</button>
+    }
+  </div>
+}

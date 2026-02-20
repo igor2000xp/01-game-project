@@ -1,0 +1,34 @@
+<div class="category-list">
+  <div class="category-header">
+    <h2>Categories</h2>
+    <button class="btn btn-primary" (click)="create.emit()">+ Add Category</button>
+  </div>
+
+  @if (categories().length === 0) {
+    <div class="empty-state">
+      <p>No categories found</p>
+      <button class="btn btn-secondary" (click)="create.emit()">Create first category</button>
+    </div>
+  } @else {
+    <div class="category-items">
+      @for (category of categories(); track category.id) {
+        <div class="category-item">
+          <div class="category-info">
+            <h3>{{ category.name }}</h3>
+            @if (category.question_count !== undefined) {
+              <span class="count-badge">{{ category.question_count }} questions</span>
+            }
+          </div>
+          <div class="category-actions">
+            <button class="action-btn edit-btn" (click)="edit.emit(category)">
+              ✎
+            </button>
+            <button class="action-btn delete-btn" (click)="delete.emit(category.id)">
+              🗑
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

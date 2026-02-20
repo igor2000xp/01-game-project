@@ -11,7 +11,10 @@
       "Bash(npx tsc:*)",
       "Bash(timeout:*)",
       "Bash(fi)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(ng:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run)"
     ]
   }
 }

@@ -1,0 +1,108 @@
+.import-progress {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progress-status {
+  font-weight: 600;
+}
+
+.progress-status.status-pending {
+  color: #6c757d;
+}
+
+.progress-status.status-processing {
+  color: #007bff;
+}
+
+.progress-status.status-completed {
+  color: #28a745;
+}
+
+.progress-status.status-failed {
+  color: #dc3545;
+}
+
+.progress-count {
+  color: #666;
+  font-size: 14px;
+}
+
+.progress-bar-container {
+  height: 20px;
+  background-color: #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #007bff;
+  transition: width 0.3s ease;
+}
+
+.progress-summary {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.summary-item.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.summary-item.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.error-list {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 6px;
+  border-left: 4px solid #dc3545;
+}
+
+.error-list h4 {
+  margin: 0 0 12px 0;
+  color: #dc3545;
+  font-size: 14px;
+}
+
+.error-item {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.error-item:last-child {
+  border-bottom: none;
+}
+
+.error-row {
+  color: #666;
+  font-weight: 500;
+}
+
+.error-message {
+  color: #721c24;
+}

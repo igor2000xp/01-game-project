@@ -1,0 +1,15 @@
+<div class="export-button" (document:click)="closeDropdown()">
+  <button class="export-btn" (click)="$event.stopPropagation(); toggleDropdown()">
+    📥 Export
+  </button>
+
+  @if (isDropdownOpen()) {
+    <div class="export-dropdown" (click)="$event.stopPropagation()">
+      @for (format of formats; track format.value) {
+        <button class="dropdown-item" (click)="onExport(format.value)">
+          {{ format.label }}
+        </button>
+      }
+    </div>
+  }
+</div>

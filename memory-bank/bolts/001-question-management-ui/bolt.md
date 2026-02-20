@@ -2,8 +2,21 @@
 id: 001-question-management-ui
 unit: 001-question-management-ui
 type: simple-construction-bolt
-status: planned
-created: 2026-02-19T15:31:17Z
+status: complete
+created: 2026-02-19T15:31:17.000Z
+started: 2026-02-20T10:00:00.000Z
+current_stage: null
+stages_completed:
+  - name: plan
+    completed: 2026-02-20T10:05:00.000Z
+    artifact: implementation-plan.md
+  - name: implement
+    completed: 2026-02-20T09:10:00.000Z
+    artifact: implementation-walkthrough.md
+  - name: test
+    completed: 2026-02-20T09:35:00.000Z
+    artifact: test-walkthrough.md
+completed: 2026-02-20T09:35:00Z
 ---
 
 # Bolt: 001-question-management-ui

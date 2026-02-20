@@ -1,0 +1,26 @@
+<div class="category-item">
+  @if (!showDeleteConfirm) {
+    <div class="category-info">
+      <h3>{{ category().name }}</h3>
+      @if (category().question_count !== undefined) {
+        <span class="count-badge">{{ category().question_count }} questions</span>
+      }
+    </div>
+    <div class="category-actions">
+      <button class="action-btn edit-btn" (click)="edit.emit(category())">
+        ✎
+      </button>
+      <button class="action-btn delete-btn" (click)="showDeleteConfirm = true">
+        🗑
+      </button>
+    </div>
+  } @else {
+    <div class="delete-confirm">
+      <p>Are you sure you want to delete <strong>{{ category().name }}</strong>?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  }
+</div>

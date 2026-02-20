@@ -1,0 +1,92 @@
+<div class="question-list">
+  <table class="questions-table">
+    <thead>
+      <tr>
+        <th>Question</th>
+        <th>Type</th>
+        <th>Category</th>
+        <th>Difficulty</th>
+        <th>Created</th>
+        <th class="actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (questions().length === 0) {
+        <tr>
+          <td colspan="6" class="empty-state">No questions found</td>
+        </tr>
+      } @else {
+        @for (question of questions(); track question.id) {
+          <tr>
+            <td class="question-text">{{ question.text }}</td>
+            <td>
+              <span class="badge type-badge">
+                {{ questionTypes[question.type] }}
+              </span>
+            </td>
+            <td>{{ getCategoryName(question.category_id) }}</td>
+            <td>
+              <span
+                class="badge difficulty-badge"
+                [style.background-color]="difficultyColors[question.difficulty || 'medium']"
+              >
+                {{ question.difficulty || 'medium' }}
+              </span>
+            </td>
+            <td>{{ formatDate(question.created_at) }}</td>
+            <td class="actions">
+              <button
+                class="action-btn edit-btn"
+                (click)="edit.emit(question.id)"
+                title="Edit"
+              >
+                ✎
+              </button>
+              <button
+                class="action-btn delete-btn"
+                (click)="delete.emit(question.id)"
+                title="Delete"
+              >
+                🗑
+              </button>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+
+  @if (totalPages() > 1) {
+    <div class="pagination">
+      <button
+        class="page-btn"
+        [disabled]="currentPage() === 1"
+        (click)="onPageChange(currentPage() - 1)"
+      >
+        ← Previous
+      </button>
+
+      @for (page of displayedPages(); track page) {
+        @if (page === '...') {
+          <span class="page-ellipsis">...</span>
+        } @else {
+          <button
+            class="page-btn"
+            [class.active]="page === currentPage()"
+            (click)="onPageChange(page)"
+          >
+            {{ page }}
+          </button>
+        }
+      }
+
+      <button
+        class="page-btn"
+        [disabled]="currentPage() === totalPages()"
+        (click)="onPageChange(currentPage() + 1)"
+      >
+        Next →
+      </button>
+    </div>
+  }
+</div>
