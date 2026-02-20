@@ -9,6 +9,7 @@ import { readFile } from 'node:fs/promises';
 import { isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { globSync } from 'glob';
+import { cwd } from 'node:process';
 
 type CleanupHookFactory = (runCleanup: boolean) => () => void;
 type ResolveResources = (resolver: (url: string) => Promise<string>) => Promise<void>;
@@ -23,7 +24,7 @@ const cleanupHookFactory = getCleanupHook as CleanupHookFactory;
 const resolveResources = ɵresolveComponentResources as ResolveResources;
 const globSyncTyped = globSync as GlobSync;
 const readFileText = readFile as ReadFileText;
-const getCwd = (process as { cwd: CwdGetter }).cwd;
+const getCwd = cwd as CwdGetter;
 const resolvePath = resolve as PathResolver;
 const isAbsolutePath = isAbsolute as PathIsAbsolute;
 const fileUrlToPath = fileURLToPath as FileUrlToPath;
