@@ -22,8 +22,10 @@ describe('QuestionFormComponent', () => {
       .nativeElement as HTMLButtonElement;
     expect(submitButton.disabled).toBe(true);
 
-    const textInput = fixture.debugElement.query(By.css('#question-text')).nativeElement as HTMLTextAreaElement;
-    const answerInput = fixture.debugElement.query(By.css('#question-answer')).nativeElement as HTMLTextAreaElement;
+    const textInput = fixture.debugElement.query(By.css('#question-text'))
+      .nativeElement as HTMLTextAreaElement;
+    const answerInput = fixture.debugElement.query(By.css('#question-answer'))
+      .nativeElement as HTMLTextAreaElement;
 
     textInput.value = 'What is 2 + 2?';
     textInput.dispatchEvent(new Event('input'));
@@ -36,8 +38,10 @@ describe('QuestionFormComponent', () => {
 
   it('emits submit with form payload when valid form is submitted', () => {
     const submitSpy = vi.spyOn(component.submit, 'emit');
-    const textInput = fixture.debugElement.query(By.css('#question-text')).nativeElement as HTMLTextAreaElement;
-    const answerInput = fixture.debugElement.query(By.css('#question-answer')).nativeElement as HTMLTextAreaElement;
+    const textInput = fixture.debugElement.query(By.css('#question-text'))
+      .nativeElement as HTMLTextAreaElement;
+    const answerInput = fixture.debugElement.query(By.css('#question-answer'))
+      .nativeElement as HTMLTextAreaElement;
 
     textInput.value = 'Capital of France?';
     textInput.dispatchEvent(new Event('input'));

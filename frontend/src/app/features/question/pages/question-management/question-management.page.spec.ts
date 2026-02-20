@@ -86,9 +86,7 @@ describe('QuestionManagementPage (integration)', () => {
   });
 
   it('shows error notification when loading questions fails', () => {
-    questionServiceMock.getQuestions.mockReturnValueOnce(
-      throwError(() => new Error('failure'))
-    );
+    questionServiceMock.getQuestions.mockReturnValueOnce(throwError(() => new Error('failure')));
 
     component.loadQuestions();
 

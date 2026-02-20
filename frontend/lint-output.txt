@@ -1,0 +1,54 @@
+
+> frontend@0.0.0 lint:fix
+> eslint . --fix
+
+
+/Volumes/MAC_DOCS/repos/rs-school-projects/01-game-project/frontend/cypress/support/commands.ts
+  2:3  error  ES2015 module syntax is preferred over namespaces  @typescript-eslint/no-namespace
+
+/Volumes/MAC_DOCS/repos/rs-school-projects/01-game-project/frontend/src/app/features/export/components/export-button/export-button.component.html
+   1:1  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+   1:1  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  15:5  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  15:5  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+/Volumes/MAC_DOCS/repos/rs-school-projects/01-game-project/frontend/src/app/features/question/components/category-list/category-list.component.ts
+  28:3   error  Unsafe assignment of an error typed value                     @typescript-eslint/no-unsafe-assignment
+  28:10  error  Unsafe construction of a type that could not be resolved      @typescript-eslint/no-unsafe-call
+  29:3   error  Unsafe assignment of an error typed value                     @typescript-eslint/no-unsafe-assignment
+  29:12  error  Unsafe construction of a type that could not be resolved      @typescript-eslint/no-unsafe-call
+  32:5   error  Unsafe call of a type that could not be resolved              @typescript-eslint/no-unsafe-call
+  32:17  error  Unsafe member access .emit on a type that cannot be resolved  @typescript-eslint/no-unsafe-member-access
+
+/Volumes/MAC_DOCS/repos/rs-school-projects/01-game-project/frontend/src/app/features/question/pages/question-management/question-management.page.html
+  79:5  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  79:5  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  80:7  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  80:7  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  91:5  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  91:5  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+  92:7  error  click must be accompanied by either keyup, keydown or keypress event for accessibility  @angular-eslint/template/click-events-have-key-events
+  92:7  error  Elements with interaction handlers must be focusable                                    @angular-eslint/template/interactive-supports-focus
+
+/Volumes/MAC_DOCS/repos/rs-school-projects/01-game-project/frontend/src/app/features/question/pages/question-management/question-management.page.ts
+  327:9   error  Unsafe assignment of an `any` value       @typescript-eslint/no-unsafe-assignment
+  327:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Volumes/MAC_DOCS/repos/rs-school-projects/01-game-project/frontend/src/app/features/question/services/question.service.ts
+  25:7   error  Unsafe assignment of an `any` value       @typescript-eslint/no-unsafe-assignment
+  25:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Volumes/MAC_DOCS/repos/rs-school-projects/01-game-project/frontend/src/app/shared/interceptors/api.interceptor.spec.ts
+  14:7   error  Unsafe return of type `Observable<any>` from function with return type `Observable<HttpEvent<unknown>>`  @typescript-eslint/no-unsafe-return
+  15:24  error  Unsafe return of a value of type error                                                                   @typescript-eslint/no-unsafe-return
+  24:7   error  Unsafe return of type `Observable<any>` from function with return type `Observable<HttpEvent<unknown>>`  @typescript-eslint/no-unsafe-return
+  25:24  error  Unsafe return of a value of type error                                                                   @typescript-eslint/no-unsafe-return
+
+/Volumes/MAC_DOCS/repos/rs-school-projects/01-game-project/frontend/src/app/shared/interceptors/api.interceptor.ts
+  20:9   error  Unsafe assignment of an `any` value              @typescript-eslint/no-unsafe-assignment
+  20:45  error  Unsafe member access .message on an `any` value  @typescript-eslint/no-unsafe-member-access
+  24:9   error  Unsafe assignment of an `any` value              @typescript-eslint/no-unsafe-assignment
+  24:37  error  Unsafe member access .message on an `any` value  @typescript-eslint/no-unsafe-member-access
+
+✖ 31 problems (31 errors, 0 warnings)
+

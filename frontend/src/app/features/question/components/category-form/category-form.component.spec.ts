@@ -27,7 +27,8 @@ describe('CategoryFormComponent', () => {
 
   it('emits submit with name when form is valid', () => {
     const submitSpy = vi.spyOn(component.submit, 'emit');
-    const input = fixture.debugElement.query(By.css('#category-name')).nativeElement as HTMLInputElement;
+    const input = fixture.debugElement.query(By.css('#category-name'))
+      .nativeElement as HTMLInputElement;
 
     input.value = 'Science';
     input.dispatchEvent(new Event('input'));

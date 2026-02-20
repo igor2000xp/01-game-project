@@ -31,12 +31,15 @@ describe('CategoryListComponent', () => {
 
   it('renders category entries with count', () => {
     expect(fixture.debugElement.query(By.css('[data-cy="category-item"]'))).toBeTruthy();
-    expect(fixture.nativeElement.textContent).toContain('2 questions');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('2 questions');
   });
 
   it('emits create when add category button is clicked', () => {
     const createSpy = vi.spyOn(component.create, 'emit');
-    (fixture.debugElement.query(By.css('[data-cy="add-category-button"]')).nativeElement as HTMLButtonElement).click();
+    (
+      fixture.debugElement.query(By.css('[data-cy="add-category-button"]'))
+        .nativeElement as HTMLButtonElement
+    ).click();
 
     expect(createSpy).toHaveBeenCalled();
   });

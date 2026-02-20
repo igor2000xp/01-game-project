@@ -2,8 +2,18 @@
   <div class="page-header">
     <h1>Question Management</h1>
     <div class="header-actions">
-      <button class="btn btn-primary" (click)="onCreateQuestion()">+ Add Question</button>
-      <button class="btn btn-secondary" (click)="onToggleImport()">
+      <button
+        class="btn btn-primary"
+        (click)="onCreateQuestion()"
+        (keydown.enter)="onCreateQuestion()"
+      >
+        + Add Question
+      </button>
+      <button
+        class="btn btn-secondary"
+        (click)="onToggleImport()"
+        (keydown.enter)="onToggleImport()"
+      >
         📤 Import
       </button>
       <app-export-button (export)="onExport($event)" />
@@ -20,7 +30,6 @@
       @if (!importProgress()) {
         <app-file-upload [maxFileSize]="10 * 1024 * 1024" (fileUpload)="onFileUpload($event)" />
       }
-
       @if (importProgress()) {
         <app-import-progress [progress]="importProgress()!" />
       }
@@ -42,7 +51,6 @@
       @if (isLoading()) {
         <div class="loading-state">Loading questions...</div>
       }
-
       @if (!isLoading()) {
         <app-question-list
           [questions]="questions()"
@@ -68,8 +76,20 @@
   </div>
 
   @if (showQuestionForm()) {
-    <div class="modal-overlay" (click)="onQuestionFormCancel()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+    <div
+      class="modal-overlay"
+      (click)="onQuestionFormCancel()"
+      (keydown.escape)="onQuestionFormCancel()"
+      role="presentation"
+    >
+      <div
+        class="modal-content"
+        (click)="$event.stopPropagation()"
+        (keydown.escape)="onQuestionFormCancel()"
+        role="dialog"
+        [attr.aria-modal]="true"
+        [attr.aria-label]="'Question form'"
+      >
         <app-question-form
           [question]="editingQuestion()"
           [categories]="categories()"
@@ -79,10 +99,21 @@
       </div>
     </div>
   }
-
   @if (showCategoryForm()) {
-    <div class="modal-overlay" (click)="onCategoryFormCancel()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+    <div
+      class="modal-overlay"
+      (click)="onCategoryFormCancel()"
+      (keydown.escape)="onCategoryFormCancel()"
+      role="presentation"
+    >
+      <div
+        class="modal-content"
+        (click)="$event.stopPropagation()"
+        (keydown.escape)="onCategoryFormCancel()"
+        role="dialog"
+        [attr.aria-modal]="true"
+        [attr.aria-label]="'Category form'"
+      >
         <app-category-form
           [category]="editingCategory()"
           (submit)="onCategorySubmit($event)"

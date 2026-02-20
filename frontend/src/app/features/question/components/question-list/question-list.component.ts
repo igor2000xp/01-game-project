@@ -1,4 +1,4 @@
-import { Component, OnInit, input, output, signal, computed } from '@angular/core';
+import { Component, OnInit, input, output, computed } from '@angular/core';
 import { Question, Category } from '../../models/question.model';
 
 @Component({
@@ -49,11 +49,7 @@ export class QuestionListComponent implements OnInit {
       if (current > 3) {
         pages.push('...');
       }
-      for (
-        let i = Math.max(2, current - 1);
-        i <= Math.min(total - 1, current + 1);
-        i++
-      ) {
+      for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
         pages.push(i);
       }
       if (current < total - 2) {

@@ -23,7 +23,7 @@ describe('FileUploadComponent', () => {
     const hint = fixture.debugElement.query(By.css('.hint'));
 
     expect(uploadArea).toBeTruthy();
-    expect(hint.nativeElement.textContent).toContain('5MB');
+    expect((hint?.nativeElement as HTMLElement).textContent).toContain('5MB');
   });
 
   it('emits fileSelected and fileUpload for a valid dropped csv file', () => {

@@ -1,4 +1,4 @@
-import { Component, input, output, signal, computed } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 import { Category } from '../../models/question.model';
 
 @Component({

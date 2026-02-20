@@ -1,4 +1,4 @@
-import { Component, input, output, Output, EventEmitter } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Category } from '../../models/question.model';
 
 @Component({
@@ -25,8 +25,9 @@ export class CategoryListItemComponent {
   category = input.required<Category>();
   showDeleteConfirm = false;
 
-  edit = new EventEmitter<Category>();
-  delete = new EventEmitter<string>();
+  edit = output<Category>();
+
+  delete = output<string>();
 
   confirmDelete(): void {
     this.delete.emit(this.category().id);

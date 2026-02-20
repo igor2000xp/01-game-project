@@ -25,7 +25,8 @@ describe('QuestionFilterComponent', () => {
 
   it('emits searchChange when typing in search input', () => {
     const searchSpy = vi.spyOn(component.searchChange, 'emit');
-    const input = fixture.debugElement.query(By.css('#search-input')).nativeElement as HTMLInputElement;
+    const input = fixture.debugElement.query(By.css('#search-input'))
+      .nativeElement as HTMLInputElement;
 
     input.value = 'fra';
     input.dispatchEvent(new Event('input'));
@@ -68,6 +69,6 @@ describe('QuestionFilterComponent', () => {
 
     const options = fixture.debugElement.queryAll(By.css('option'));
     expect(options).toHaveLength(3);
-    expect(options[1].nativeElement.textContent).toContain('Geography');
+    expect((options[1]?.nativeElement as HTMLElement).textContent).toContain('Geography');
   });
 });

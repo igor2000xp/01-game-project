@@ -28,11 +28,7 @@
     <div class="form-row">
       <div class="form-group">
         <label for="question-type">Type *</label>
-        <select
-          id="question-type"
-          [value]="formData().type"
-          (change)="onTypeSelect($event)"
-        >
+        <select id="question-type" [value]="formData().type" (change)="onTypeSelect($event)">
           @for (type of availableTypes; track type) {
             <option [value]="type">{{ type }}</option>
           }
@@ -55,7 +51,7 @@
 
     @if (isMultipleChoice()) {
       <div class="form-group options-group">
-        <label>Options (at least 2)</label>
+        <label for="options-input">Options (at least 2)</label>
         @for (option of formData().options; track option; let i = $index) {
           <div class="option-input">
             <span class="option-label">{{ i + 1 }}.</span>
@@ -66,19 +62,11 @@
               placeholder="Option {{ i + 1 }}"
             />
             @if (formData().options.length > 2) {
-              <button
-                type="button"
-                class="remove-option-btn"
-                (click)="removeOption(i)"
-              >×</button>
+              <button type="button" class="remove-option-btn" (click)="removeOption(i)">×</button>
             }
           </div>
         }
-        <button
-          type="button"
-          class="add-option-btn"
-          (click)="addOption()"
-        >+ Add Option</button>
+        <button type="button" class="add-option-btn" (click)="addOption()">+ Add Option</button>
       </div>
     }
 
@@ -98,14 +86,8 @@
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" (click)="onCancel()">
-        Cancel
-      </button>
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="!isFormValid()"
-      >
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="!isFormValid()">
         {{ isEditMode() ? 'Update' : 'Create' }} Question
       </button>
     </div>

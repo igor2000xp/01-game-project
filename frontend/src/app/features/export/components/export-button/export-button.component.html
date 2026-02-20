@@ -1,12 +1,42 @@
-<div class="export-button" (document:click)="closeDropdown()">
-  <button class="export-btn" data-cy="export-button" (click)="$event.stopPropagation(); toggleDropdown()">
+<div
+  class="export-button"
+  (document:click)="closeDropdown()"
+  (keydown.escape)="closeDropdown()"
+  tabindex="0"
+  role="group"
+>
+  <button
+    class="export-btn"
+    data-cy="export-button"
+    (click)="$event.stopPropagation(); toggleDropdown()"
+    (keydown.enter)="$event.stopPropagation(); toggleDropdown()"
+    (keydown.space)="$event.stopPropagation(); toggleDropdown()"
+    [attr.aria-expanded]="isDropdownOpen()"
+    [attr.aria-haspopup]="true"
+    tabindex="0"
+  >
     📥 Export
   </button>
 
   @if (isDropdownOpen()) {
-    <div class="export-dropdown" data-cy="export-format-dropdown" (click)="$event.stopPropagation()">
+    <div
+      class="export-dropdown"
+      data-cy="export-format-dropdown"
+      (click)="$event.stopPropagation()"
+      (keydown.enter)="$event.stopPropagation()"
+      (keydown.space)="$event.stopPropagation()"
+      role="menu"
+      tabindex="0"
+    >
       @for (format of formats; track format.value) {
-        <button class="dropdown-item" data-cy="format-option" (click)="onExport(format.value)">
+        <button
+          class="dropdown-item"
+          data-cy="format-option"
+          (click)="onExport(format.value)"
+          (keydown.enter)="onExport(format.value)"
+          role="menuitem"
+          tabindex="0"
+        >
           {{ format.label }}
         </button>
       }

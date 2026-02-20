@@ -45,9 +45,7 @@ export class QuestionFormComponent {
   readonly availableTypes: QuestionType[] = ['open-ended', 'multiple-choice', 'true-false'];
   readonly availableDifficulties: Difficulty[] = ['easy', 'medium', 'hard'];
 
-  readonly isMultipleChoice = computed(
-    () => this.formData().type === 'multiple-choice'
-  );
+  readonly isMultipleChoice = computed(() => this.formData().type === 'multiple-choice');
 
   constructor() {
     effect(() => {

@@ -55,9 +55,7 @@ export class FileUploadComponent {
 
     // Validate file size
     if (file.size > this.maxFileSize()) {
-      this.errorMessage.set(
-        `File size exceeds ${this.maxFileSize() / 1024 / 1024}MB limit`
-      );
+      this.errorMessage.set(`File size exceeds ${this.maxFileSize() / 1024 / 1024}MB limit`);
       return;
     }
 

@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { NotificationService, Notification, NotificationType } from '../../services/notification.service';
+import { NotificationService, NotificationType } from '../../services/notification.service';
 
 @Component({
   selector: 'app-notification',

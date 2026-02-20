@@ -16,14 +16,8 @@
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn btn-secondary" (click)="onCancel()">
-        Cancel
-      </button>
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="!isFormValid()"
-      >
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="!isFormValid()">
         {{ isEditMode() ? 'Update' : 'Create' }} Category
       </button>
     </div>

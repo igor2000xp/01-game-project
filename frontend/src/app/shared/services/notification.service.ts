@@ -16,11 +16,7 @@ export class NotificationService {
   private notifications = signal<Notification[]>([]);
   readonly notifications$ = this.notifications.asReadonly();
 
-  show(
-    type: NotificationType,
-    message: string,
-    duration: number = 3000
-  ): void {
+  show(type: NotificationType, message: string, duration: number = 3000): void {
     const notification: Notification = {
       id: this.generateId(),
       type,

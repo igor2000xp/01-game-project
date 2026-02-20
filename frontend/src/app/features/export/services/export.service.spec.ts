@@ -1,9 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { describe, beforeEach, afterEach, it, expect, vi } from 'vitest';
 import { ExportService } from './export.service';
 
@@ -34,13 +31,9 @@ describe('ExportService', () => {
   });
 
   it('downloads blob using object URL and temporary anchor', () => {
-    const createObjectUrlSpy = vi
-      .spyOn(window.URL, 'createObjectURL')
-      .mockReturnValue('blob:mock');
+    const createObjectUrlSpy = vi.spyOn(window.URL, 'createObjectURL').mockReturnValue('blob:mock');
     const revokeSpy = vi.spyOn(window.URL, 'revokeObjectURL').mockImplementation(() => {});
-    const clickSpy = vi
-      .spyOn(HTMLAnchorElement.prototype, 'click')
-      .mockImplementation(() => {});
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
 
     service.downloadFile(new Blob(['x']), 'file.csv');
 
@@ -52,8 +45,6 @@ describe('ExportService', () => {
   it('generates timestamped filenames with selected format', () => {
     const filename = service.generateFilename('json');
 
-    expect(filename).toMatch(
-      /questions-export-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json/
-    );
+    expect(filename).toMatch(/questions-export-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json/);
   });
 });

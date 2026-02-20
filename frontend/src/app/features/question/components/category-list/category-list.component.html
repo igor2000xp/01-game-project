@@ -1,7 +1,9 @@
 <div class="category-list" data-cy="category-list">
   <div class="category-header">
     <h2>Categories</h2>
-    <button class="btn btn-primary" (click)="create.emit()" data-cy="add-category-button">+ Add Category</button>
+    <button class="btn btn-primary" (click)="create.emit()" data-cy="add-category-button">
+      + Add Category
+    </button>
   </div>
 
   @if (categories().length === 0) {
@@ -20,12 +22,8 @@
             }
           </div>
           <div class="category-actions">
-            <button class="action-btn edit-btn" (click)="edit.emit(category)">
-              ✎
-            </button>
-            <button class="action-btn delete-btn" (click)="delete.emit(category.id)">
-              🗑
-            </button>
+            <button class="action-btn edit-btn" (click)="edit.emit(category)">✎</button>
+            <button class="action-btn delete-btn" (click)="delete.emit(category.id)">🗑</button>
           </div>
         </div>
       }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import {
   Question,
@@ -22,7 +22,7 @@ export class QuestionService {
 
   getQuestions(filter: QuestionFilter = {}): Observable<QuestionListResponse> {
     return this.http.get<QuestionListResponse>('/questions', {
-      params: filter as any,
+      params: this.buildParams(filter),
     });
   }
 
@@ -52,9 +52,9 @@ export class QuestionService {
 
   getCategories(includeCounts = false): Observable<Category[]> {
     if (includeCounts) {
-      return this.http.get<{ data: Category[] }>('/categories/with-counts').pipe(
-        map((response: { data: Category[] }) => response.data)
-      );
+      return this.http
+        .get<{ data: Category[] }>('/categories/with-counts')
+        .pipe(map((response: { data: Category[] }) => response.data));
     }
     return this.http.get<Category[]>('/categories');
   }
@@ -73,5 +73,15 @@ export class QuestionService {
 
   deleteCategory(id: string): Observable<void> {
     return this.http.delete<void>(`/categories/${id}`);
+  }
+
+  private buildParams(filter: QuestionFilter): HttpParams {
+    return Object.entries(filter).reduce((params, [key, value]) => {
+      if (value === undefined || value === null || value === '') {
+        return params;
+      }
+
+      return params.set(key, String(value));
+    }, new HttpParams());
   }
 }

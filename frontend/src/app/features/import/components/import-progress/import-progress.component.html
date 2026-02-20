@@ -5,21 +5,14 @@
   </div>
 
   <div class="progress-bar-container">
-    <div
-      class="progress-bar"
-      [style.width.%]="progressPercent()"
-    ></div>
+    <div class="progress-bar" [style.width.%]="progressPercent()"></div>
   </div>
 
   @if (isComplete()) {
     <div class="progress-summary">
-      <div class="summary-item success">
-        <span>✓</span> {{ progress().success }} successful
-      </div>
+      <div class="summary-item success"><span>✓</span> {{ progress().success }} successful</div>
       @if (progress().failed > 0) {
-        <div class="summary-item error">
-          <span>✕</span> {{ progress().failed }} failed
-        </div>
+        <div class="summary-item error"><span>✕</span> {{ progress().failed }} failed</div>
       }
     </div>
   }

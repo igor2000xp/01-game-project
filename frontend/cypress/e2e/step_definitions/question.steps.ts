@@ -87,9 +87,7 @@ When(
 );
 
 When('I delete the first question', () => {
-  cy.intercept('DELETE', '**/api/questions/*', { statusCode: 200, body: {} }).as(
-    'deleteQuestion'
-  );
+  cy.intercept('DELETE', '**/api/questions/*', { statusCode: 200, body: {} }).as('deleteQuestion');
 
   cy.get('[data-cy="question-item"]').first().find('[data-cy="delete-button"]').click();
   cy.wait('@deleteQuestion');

@@ -9,6 +9,10 @@
     "typecheck": "npm run typecheck:app && npm run typecheck:cypress",
     "typecheck:app": "tsc -p tsconfig.app.json --noEmit",
     "typecheck:cypress": "tsc -p cypress/tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "test": "vitest",
     "test:unit": "vitest run src/**/*.service.spec.ts src/**/*.interceptor.spec.ts",
     "test:integration": "vitest run src/**/*.page.spec.ts",
@@ -22,6 +26,11 @@
   "prettier": {
     "printWidth": 100,
     "singleQuote": true,
+    "trailingComma": "es5",
+    "semi": true,
+    "arrowParens": "always",
+    "tabWidth": 2,
+    "useTabs": false,
     "overrides": [
       {
         "files": "*.html",
@@ -46,6 +55,9 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^21.1.4",
     "@angular-devkit/core": "^21.1.4",
+    "@angular-eslint/eslint-plugin": "^20.2.0",
+    "@angular-eslint/eslint-plugin-template": "^20.2.0",
+    "@angular-eslint/template-parser": "^20.2.0",
     "@angular/build": "^21.0.5",
     "@angular/cli": "^21.0.5",
     "@angular/compiler-cli": "^21.0.0",
@@ -54,10 +66,17 @@
     "@cypress/angular": "^4.1.0",
     "@cypress/webpack-dev-server": "^5.6.0",
     "@cypress/webpack-preprocessor": "^7.0.2",
+    "@eslint/js": "^9.21.0",
     "@percy/cypress": "^3.1.7",
     "cypress": "^15.10.0",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.14.0",
     "jsdom": "^26.1.0",
+    "prettier": "^3.5.3",
     "typescript": "~5.9.2",
+    "typescript-eslint": "^8.26.0",
     "vitest": "^4.0.7",
     "zone.js": "^0.16.1"
   }

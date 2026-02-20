@@ -1,11 +1,27 @@
-import {
-  HttpErrorResponse,
-  HttpEvent,
-  HttpHandlerFn,
-  HttpRequest,
-} from '@angular/common/http';
+import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { Observable, throwError, catchError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+
+const getErrorMessage = (error: HttpErrorResponse): string => {
+  const payload: unknown = error.error;
+
+  if (payload instanceof ErrorEvent) {
+    return payload.message;
+  }
+
+  if (typeof payload === 'string') {
+    return payload;
+  }
+
+  if (payload && typeof payload === 'object' && 'message' in payload) {
+    const message = (payload as { message?: unknown }).message;
+    if (typeof message === 'string') {
+      return message;
+    }
+  }
+
+  return `Error Code: ${error.status}`;
+};
 
 export const apiInterceptor = (
   req: HttpRequest<unknown>,
@@ -17,16 +33,6 @@ export const apiInterceptor = (
     : req;
 
   return next(apiReq).pipe(
-    catchError((error: HttpErrorResponse) => {
-      let errorMessage = 'An error occurred';
-      if (error.error instanceof ErrorEvent) {
-        // Client-side error
-        errorMessage = error.error.message;
-      } else {
-        // Server-side error
-        errorMessage = error.error?.message || `Error Code: ${error.status}`;
-      }
-      return throwError(() => errorMessage);
-    })
+    catchError((error: HttpErrorResponse) => throwError(() => getErrorMessage(error)))
   );
 };

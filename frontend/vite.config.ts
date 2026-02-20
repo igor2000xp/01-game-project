@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   test: {
@@ -7,6 +7,6 @@ export default defineConfig({
     setupFiles: ['./src/test-setup.ts'],
     include: ['src/**/*.spec.ts'],
     restoreMocks: true,
-    clearMocks: true
-  }
-})
+    clearMocks: true,
+  },
+});

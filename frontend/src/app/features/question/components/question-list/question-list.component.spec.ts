@@ -49,12 +49,15 @@ describe('QuestionListComponent', () => {
 
   it('renders question rows and resolves category names', () => {
     expect(fixture.debugElement.query(By.css('[data-cy="question-item"]'))).toBeTruthy();
-    expect(fixture.nativeElement.textContent).toContain('Math');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Math');
   });
 
   it('emits delete event when delete button is clicked', () => {
     const deleteSpy = vi.spyOn(component.delete, 'emit');
-    (fixture.debugElement.query(By.css('[data-cy="delete-button"]')).nativeElement as HTMLButtonElement).click();
+    (
+      fixture.debugElement.query(By.css('[data-cy="delete-button"]'))
+        .nativeElement as HTMLButtonElement
+    ).click();
 
     expect(deleteSpy).toHaveBeenCalledWith('q1');
   });

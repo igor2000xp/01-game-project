@@ -6,7 +6,7 @@ import { NotificationComponent } from './shared/components/notification/notifica
   selector: 'app-root',
   imports: [RouterOutlet, NotificationComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('Question Management');

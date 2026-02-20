@@ -3,6 +3,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "composite": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,
@@ -23,7 +24,7 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  "files": [],
+  "include": ["src/**/*.ts", "vite.config.ts", "cypress.config.ts"],
   "references": [
     {
       "path": "./tsconfig.app.json"
