@@ -3,7 +3,7 @@ import { ExportController } from './export.controller';
 import { ExportService } from '../services/export.service';
 import { ExportFormat } from '../dto/export-request.dto';
 import { BadRequestException } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 
 describe('ExportController', () => {
   let controller: ExportController;
@@ -96,7 +96,7 @@ describe('ExportController', () => {
     });
 
     it('should throw BadRequestException for invalid format', async () => {
-      const request = { format: 'xml' } as { format: ExportFormat };
+      const request = { format: 'xml' as unknown as ExportFormat };
       const errorResult = {
         success: false,
         format: 'xml',

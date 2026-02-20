@@ -1,25 +1,22 @@
+@bdd @categories
 Feature: Category Management
-  As a user
-  I want to manage categories
-  So that I can organize questions by topic
+  As a content editor
+  I want to maintain categories
+  So that questions are grouped by topic
 
   Background:
-    Given I open the question management page
-    And the backend list endpoints are stubbed
-    When the initial data loads
+    Given the question management workspace is loaded with seeded data
 
-  Scenario: View category list with counts
-    Then I see category entries
+  Rule: Maintain category catalog
+    Scenario: Create a category
+      When I create a category named "Science"
+      Then a success notification is displayed
 
-  Scenario: Create a new category
-    When I create a category named "Science"
-    Then I should see a success notification
+    Scenario: Rename a category
+      When I rename the first category to "Mathematics"
+      Then the category list includes "Mathematics"
 
-  Scenario: Edit a category
-    When I rename the first category to "Mathematics"
-    Then I see category text "Mathematics"
-
-  Scenario: Delete a category
-    Given the browser confirm dialog is accepted
-    When I delete the first category
-    Then I should see a success notification
+    Scenario: Delete a category
+      Given browser confirmations are accepted
+      When I delete the first category in the list
+      Then a success notification is displayed

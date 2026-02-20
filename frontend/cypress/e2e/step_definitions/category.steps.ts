@@ -9,7 +9,7 @@ When('I create a category named {string}', (name: string) => {
     updated_at: '2024-01-01',
   }).as('createCategory');
 
-  cy.contains('[data-cy="add-category-button"]', 'Add Category').click();
+  cy.get('[data-cy="add-category-button"]').click();
   cy.get('[data-cy="category-name"]').clear().type(name);
   cy.get('button[type="submit"]').contains('Create Category').click();
 
@@ -44,13 +44,14 @@ When('I rename the first category to {string}', (name: string) => {
   cy.wait('@getUpdatedCategories');
 });
 
-Then('I see category text {string}', (text: string) => {
+Then('the category list includes {string}', (text: string) => {
   cy.get('[data-cy="category-item"]').first().should('contain.text', text);
 });
 
-When('I delete the first category', () => {
-  cy.intercept('DELETE', '**/api/categories/*', { statusCode: 200, body: {} }).as('deleteCategory');
+When('I delete the first category in the list', () => {
+  cy.intercept('DELETE', '**/api/categories/*', { statusCode: 200, body: {} }).as(
+    'deleteCategory'
+  );
   cy.get('[data-cy="category-item"]').first().find('.delete-btn').click();
-
   cy.wait('@deleteCategory');
 });

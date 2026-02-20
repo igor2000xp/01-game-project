@@ -22,7 +22,7 @@ describe('ImportValidatorService', () => {
         question_text: 'What is the capital of France?',
         reference_answer: 'Paris is the capital of France.',
       };
-      const result = service.validateQuestionData(data, 1);
+      const result = service.validateQuestionData(data);
 
       expect(result.isValid).toBe(true);
       expect(result.errors).toHaveLength(0);
@@ -32,7 +32,7 @@ describe('ImportValidatorService', () => {
       const data = {
         reference_answer: 'Paris',
       };
-      const result = service.validateQuestionData(data, 1);
+      const result = service.validateQuestionData(data);
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Column 'question_text' is required");
@@ -43,7 +43,7 @@ describe('ImportValidatorService', () => {
         question_text: 'Short',
         reference_answer: 'Paris',
       };
-      const result = service.validateQuestionData(data, 1);
+      const result = service.validateQuestionData(data);
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain(
@@ -55,7 +55,7 @@ describe('ImportValidatorService', () => {
       const data = {
         question_text: 'What is the capital of France?',
       };
-      const result = service.validateQuestionData(data, 1);
+      const result = service.validateQuestionData(data);
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain("Column 'reference_answer' is required");
@@ -66,7 +66,7 @@ describe('ImportValidatorService', () => {
         question_text: 'What is the capital of France?',
         reference_answer: 'Short',
       };
-      const result = service.validateQuestionData(data, 1);
+      const result = service.validateQuestionData(data);
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain(
@@ -80,7 +80,7 @@ describe('ImportValidatorService', () => {
         reference_answer: 'Paris is the capital of France.',
         category: 'Geography',
       };
-      const result = service.validateQuestionData(data, 1);
+      const result = service.validateQuestionData(data);
 
       expect(result.isValid).toBe(true);
     });
@@ -91,7 +91,7 @@ describe('ImportValidatorService', () => {
         reference_answer: 'Paris',
         category: 'Ab',
       };
-      const result = service.validateQuestionData(data, 1);
+      const result = service.validateQuestionData(data);
 
       expect(result.isValid).toBe(false);
       expect(result.errors).toContain(

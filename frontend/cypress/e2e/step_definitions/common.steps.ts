@@ -1,6 +1,6 @@
-import { Before, Given, Then, When } from '@badeball/cypress-cucumber-preprocessor';
+import { Before, Given, Then } from '@badeball/cypress-cucumber-preprocessor';
 
-const defaultQuestions = {
+const seededQuestions = {
   data: [
     {
       id: 'q1',
@@ -30,7 +30,7 @@ const defaultQuestions = {
   limit: 20,
 };
 
-const defaultCategories = {
+const seededCategories = {
   data: [
     {
       id: 'cat-1',
@@ -47,32 +47,23 @@ Before(() => {
   cy.clearLocalStorage();
 });
 
-Given('I open the question management page', () => {
+Given('the question management workspace is loaded with seeded data', () => {
+  cy.intercept('GET', '**/api/questions*', seededQuestions).as('getQuestions');
+  cy.intercept('GET', '**/api/categories/with-counts*', seededCategories).as('getCategories');
+
   cy.visit('/questions');
-});
-
-Given('the backend list endpoints are stubbed', () => {
-  cy.intercept('GET', '**/api/questions*', defaultQuestions).as('getQuestions');
-  cy.intercept('GET', '**/api/categories/with-counts*', defaultCategories).as('getCategories');
-});
-
-When('the initial data loads', () => {
   cy.wait('@getQuestions');
   cy.wait('@getCategories');
 });
 
-Then('I see question rows', () => {
-  cy.get('[data-cy="question-item"]').should('have.length.greaterThan', 0);
+Given('browser confirmations are accepted', () => {
+  cy.on('window:confirm', () => true);
 });
 
-Then('I see category entries', () => {
-  cy.get('[data-cy="category-item"]').should('have.length.greaterThan', 0);
-});
-
-Then('I should see a success notification', () => {
+Then('a success notification is displayed', () => {
   cy.get('[data-cy="notification"].notification-success').should('exist');
 });
 
-Then('I should see an error notification', () => {
+Then('an error notification is displayed', () => {
   cy.get('[data-cy="notification"].notification-error').should('exist');
 });

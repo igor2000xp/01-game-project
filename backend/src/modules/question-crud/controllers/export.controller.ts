@@ -7,7 +7,7 @@ import {
   HttpStatus,
   BadRequestException,
 } from '@nestjs/common';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { ExportService } from '../services/export.service';
 import { ExportRequestDto } from '../dto/export-request.dto';
 

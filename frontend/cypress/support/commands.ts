@@ -1,7 +1,7 @@
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
-    interface Chainable<Subject = unknown> {
+    interface Chainable<Subject> {
       clickByDataCy(selector: string): Chainable<Subject>;
       typeByDataCy(selector: string, text: string): Chainable<Subject>;
       verifyNotification(

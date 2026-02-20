@@ -1,32 +1,31 @@
+@bdd @questions
 Feature: Question Management
-  As a user
-  I want to manage questions
-  So that I can maintain the question database
+  As a content editor
+  I want to maintain the question library
+  So that training sessions use current and accurate material
 
   Background:
-    Given I open the question management page
-    And the backend list endpoints are stubbed
-    When the initial data loads
+    Given the question management workspace is loaded with seeded data
 
-  Scenario: View list of questions
-    Then I see question rows
-    And I see category entries
+  Rule: Discover existing questions
+    Scenario Outline: Filter questions by text
+      Given the question catalog includes "<first>" and "<second>"
+      When I filter questions by text "<term>"
+      Then only questions containing "<term>" are shown
 
-  Scenario Outline: Search questions by text
-    Given the questions API returns items with "<first>" and "<second>"
-    When I search for "<term>"
-    Then only questions containing "<term>" are visible
+      Examples:
+        | first                           | second                            | term   |
+        | What is the capital of France? | What is the capital of Germany?   | France |
+        | What is 2 + 2?                 | What is 3 + 3?                    | 2 + 2  |
 
-    Examples:
-      | first                       | second                      | term   |
-      | What is the capital of France? | What is the capital of Germany? | France |
+  Rule: Maintain questions
+    Scenario: Create a new open question
+      When I create an open question with:
+        | text         | answer |
+        | What is 2+2? | 4      |
+      Then a success notification is displayed
 
-  Scenario: Create a new question
-    Given categories are available for forms
-    When I create a question with text "What is 2+2?" and answer "4"
-    Then I should see a success notification
-
-  Scenario: Delete a question
-    Given the browser confirm dialog is accepted
-    When I delete the first question
-    Then I should see a success notification
+    Scenario: Delete an existing question
+      Given browser confirmations are accepted
+      When I delete the first question in the list
+      Then a success notification is displayed

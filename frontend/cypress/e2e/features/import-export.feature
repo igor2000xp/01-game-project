@@ -1,31 +1,32 @@
+@bdd @import-export
 Feature: Import and Export Questions
-  As a user
+  As a content editor
   I want to import and export questions
-  So that I can backup and migrate my question database
+  So that I can migrate and back up the catalog safely
 
   Background:
-    Given I open the question management page
-    And the backend list endpoints are stubbed
-    When the initial data loads
+    Given the question management workspace is loaded with seeded data
 
-  Scenario Outline: Export questions
-    Given export endpoint is stubbed for "<format>"
-    When I export questions as "<format>"
-    Then an export request for "<format>" is sent
-    And I should see a success notification
+  Rule: Export catalog
+    Scenario Outline: Export questions in supported formats
+      Given export service returns a "<format>" payload
+      When I request question export in "<format>" format
+      Then the export request uses "<format>" format
+      And a success notification is displayed
 
-    Examples:
-      | format |
-      | CSV    |
-      | JSON   |
+      Examples:
+        | format |
+        | CSV    |
+        | JSON   |
 
-  Scenario: Import a valid CSV file
-    Given successful import endpoints are stubbed
-    When I upload file "test-questions.csv"
-    Then I should see a success notification
+  Rule: Import catalog
+    Scenario: Import a valid CSV file
+      Given import processing eventually succeeds
+      When I import fixture file "test-questions.csv"
+      Then a success notification is displayed
 
-  Scenario: Import fails with invalid file
-    Given failed import upload endpoint is stubbed
-    When I upload file "invalid.txt"
-    Then I see file validation error
-    And no import upload request is sent
+    Scenario: Reject unsupported import files
+      Given import upload endpoint is observed
+      When I import fixture file "invalid.txt"
+      Then I see file validation feedback
+      And no import upload request is sent

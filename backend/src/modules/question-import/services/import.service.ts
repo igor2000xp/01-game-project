@@ -123,7 +123,7 @@ export class ImportService {
       const rowNumber = i + 1;
 
       // Validate record
-      const validation = this.validator.validateQuestionData(record, rowNumber);
+      const validation = this.validator.validateQuestionData(record);
 
       if (!validation.isValid) {
         // Log validation error
