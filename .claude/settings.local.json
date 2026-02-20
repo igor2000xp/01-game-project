@@ -14,7 +14,11 @@
       "Bash(done)",
       "Bash(ng:*)",
       "Bash(npm run lint:*)",
-      "Bash(npm run)"
+      "Bash(npm run)",
+      "Bash(curl -s http://localhost:420)",
+      "Bash(npm run test:component:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)"
     ]
   }
 }

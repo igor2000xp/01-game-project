@@ -1,35 +1,58 @@
-import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Then, When } from '@badeball/cypress-cucumber-preprocessor';
 
-Given('there is a category {string}', (categoryName: string) => {
-  cy.intercept('GET', '/api/categories*', {
-    body: [{ id: 1, name: categoryName, questionCount: 5 }]
-  }).as('getCategories')
-})
+When('I create a category named {string}', (name: string) => {
+  cy.intercept('POST', '**/api/categories', {
+    id: 'cat-new',
+    name,
+    question_count: 0,
+    created_at: '2024-01-01',
+    updated_at: '2024-01-01',
+  }).as('createCategory');
 
-When('I click the {string} button', (buttonText: string) => {
-  cy.contains('button', buttonText).click()
-})
+  cy.contains('[data-cy="add-category-button"]', 'Add Category').click();
+  cy.get('[data-cy="category-name"]').clear().type(name);
+  cy.get('button[type="submit"]').contains('Create Category').click();
 
-When('I enter the category name {string}', (name: string) => {
-  cy.get('[data-cy="category-name"]').clear().type(name)
-})
+  cy.wait('@createCategory');
+});
 
-When('I change the name to {string}', (name: string) => {
-  cy.get('[data-cy="category-name"]').clear().type(name)
-})
+When('I rename the first category to {string}', (name: string) => {
+  cy.intercept('PUT', '**/api/categories/*', {
+    id: 'cat-1',
+    name,
+    question_count: 1,
+    created_at: '2024-01-01',
+    updated_at: '2024-01-01',
+  }).as('updateCategory');
+  cy.intercept('GET', '**/api/categories/with-counts*', {
+    data: [
+      {
+        id: 'cat-1',
+        name,
+        question_count: 1,
+        created_at: '2024-01-01',
+        updated_at: '2024-01-01',
+      },
+    ],
+  }).as('getUpdatedCategories');
 
-Then('I should see all categories with their question counts', () => {
-  cy.get('[data-cy="category-item"]').should('have.length.greaterThan', 0)
-})
+  cy.get('[data-cy="category-item"]').first().find('.edit-btn').click();
+  cy.get('[data-cy="category-name"]').clear().type(name);
+  cy.get('button[type="submit"]').contains('Update Category').click();
 
-Then('the category should appear in the list', () => {
-  cy.get('[data-cy="category-item"]').should('be.visible')
-})
+  cy.wait('@updateCategory');
+  cy.wait('@getUpdatedCategories');
+});
 
-Then('the category should be updated', () => {
-  cy.get('[data-cy="category-item"]').should('contain', 'Math')
-})
+Then('I see category text {string}', (text: string) => {
+  cy.get('[data-cy="category-item"]').first().should('contain.text', text);
+});
 
-Then('the category should be removed', () => {
-  cy.get('[data-cy="category-item"]').should('not.exist')
-})
+When('I delete the first category', () => {
+  cy.intercept('DELETE', '**/api/categories/*', { statusCode: 200, body: {} }).as(
+    'deleteCategory'
+  );
+  cy.get('[data-cy="category-item"]').first().find('.delete-btn').click();
+
+  cy.wait('@deleteCategory');
+});

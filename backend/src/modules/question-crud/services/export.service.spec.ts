@@ -1,14 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { ExportService } from '../services/export.service';
-import { ExportRequestDto, ExportFormat } from '../dto/export-request.dto';
+import { ExportFormat } from '../dto/export-request.dto';
 import { QuestionRepository } from '../repositories/question.repository';
+import { Question } from '../entities/question.entity';
 
 describe('ExportService', () => {
   let service: ExportService;
+  type ExportQuery = { category_id?: string; include_deleted?: boolean };
   const mockQuestionRepo = {
-    getQuestionsForExport: jest.fn(),
+    getQuestionsForExport: jest.fn<Promise<Question[]>, [ExportQuery]>(),
   };
+
+  const buildQuestion = (overrides: Partial<Question> = {}): Question => ({
+    id: 'q1',
+    question_text: 'What is the capital of France?',
+    reference_answer: 'Paris',
+    category_id: null,
+    created_at: new Date('2026-01-15T10:00:00.000Z'),
+    updated_at: new Date('2026-01-15T10:00:00.000Z'),
+    deleted_at: null,
+    is_deleted: false,
+    ...overrides,
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,16 +46,7 @@ describe('ExportService', () => {
 
   describe('exportQuestions', () => {
     it('should export questions to CSV format', async () => {
-      const questions = [
-        {
-          id: 'q1',
-          question_text: 'What is the capital of France?',
-          reference_answer: 'Paris',
-          category_id: 'cat-1',
-          created_at: new Date('2026-01-15T10:00:00.000Z'),
-          updated_at: new Date('2026-01-15T10:00:00.000Z'),
-        },
-      ];
+      const questions = [buildQuestion({ category_id: 'cat-1' })];
 
       mockQuestionRepo.getQuestionsForExport.mockResolvedValue(questions);
 
@@ -60,14 +65,10 @@ describe('ExportService', () => {
 
     it('should export questions to JSON format', async () => {
       const questions = [
-        {
-          id: 'q1',
+        buildQuestion({
           question_text: 'Simple question',
           reference_answer: 'Simple answer',
-          category_id: null,
-          created_at: new Date('2026-01-15T10:00:00.000Z'),
-          updated_at: new Date('2026-01-15T10:00:00.000Z'),
-        },
+        }),
       ];
 
       mockQuestionRepo.getQuestionsForExport.mockResolvedValue(questions);
@@ -89,22 +90,18 @@ describe('ExportService', () => {
 
       await expect(
         service.exportQuestions({
-          format: 'invalid' as any,
+          format: 'invalid' as ExportFormat,
         }),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should include deleted questions when requested', async () => {
       const questions = [
-        {
-          id: 'q1',
+        buildQuestion({
           question_text: 'Deleted question',
           reference_answer: 'Deleted answer',
-          category_id: null,
-          created_at: new Date('2026-01-15T10:00:00.000Z'),
-          updated_at: new Date('2026-01-15T10:00:00.000Z'),
           is_deleted: true,
-        },
+        }),
       ];
 
       mockQuestionRepo.getQuestionsForExport.mockResolvedValue(questions);
@@ -124,33 +121,36 @@ describe('ExportService', () => {
 
   describe('generateFilename', () => {
     it('should generate CSV filename', () => {
-      const filename = service.generateFilename('csv');
-      expect(filename).toMatch(/^questions_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.csv$/);
+      const filename = service.generateFilename(ExportFormat.CSV);
+      expect(filename).toMatch(
+        /^questions_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.csv$/,
+      );
     });
 
     it('should generate JSON filename', () => {
-      const filename = service.generateFilename('json');
-      expect(filename).toMatch(/^questions_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/);
+      const filename = service.generateFilename(ExportFormat.JSON);
+      expect(filename).toMatch(
+        /^questions_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/,
+      );
     });
   });
 
   describe('generateCSV', () => {
     it('should generate valid CSV with BOM', () => {
       const questions = [
-        {
-          id: 'q1',
+        buildQuestion({
           question_text: 'Question',
           reference_answer: 'Answer',
           category_id: 'cat-1',
-          created_at: new Date('2026-01-15T10:00:00.000Z'),
-          updated_at: new Date('2026-01-15T10:00:00.000Z'),
-        },
+        }),
       ];
 
       const csv = service.generateCSV(questions);
 
       expect(csv).toContain('\uFEFF'); // BOM
-      expect(csv).toContain('id,question_text,reference_answer,category_id,created_at,updated_at');
+      expect(csv).toContain(
+        'id,question_text,reference_answer,category_id,created_at,updated_at',
+      );
       expect(csv).toContain('"q1"');
       expect(csv).toContain('Question');
       expect(csv).toContain('Answer');
@@ -158,14 +158,11 @@ describe('ExportService', () => {
 
     it('should escape commas in fields', () => {
       const questions = [
-        {
-          id: 'q1',
+        buildQuestion({
           question_text: 'Question with "quotes"',
           reference_answer: 'Answer with "quotes"',
           category_id: 'cat-1',
-          created_at: new Date('2026-01-15T10:00:00.000Z'),
-          updated_at: new Date('2026-01-15T10:00:00.000Z'),
-        },
+        }),
       ];
 
       const csv = service.generateCSV(questions);
@@ -177,19 +174,15 @@ describe('ExportService', () => {
   describe('generateJSON', () => {
     it('should generate valid JSON', () => {
       const questions = [
-        {
-          id: 'q1',
+        buildQuestion({
           question_text: 'Simple question',
           reference_answer: 'Simple answer',
-          category_id: null,
-          created_at: new Date('2026-01-15T10:00:00.000Z'),
-          updated_at: new Date('2026-01-15T10:00:00.000Z'),
-        },
+        }),
       ];
 
       const json = service.generateJSON(questions);
 
-      const parsed = JSON.parse(json);
+      const parsed = JSON.parse(json) as Question[];
       expect(parsed).toHaveLength(1);
       expect(parsed[0].id).toBe('q1');
       expect(parsed[0].question_text).toBe('Simple question');

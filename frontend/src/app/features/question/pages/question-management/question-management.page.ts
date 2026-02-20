@@ -6,12 +6,17 @@ import {
   QuestionFilter,
   CreateQuestionDto,
   UpdateQuestionDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+  QuestionListResponse,
 } from '../../models/question.model';
 import { QuestionService } from '../../services/question.service';
 import { ImportService } from '../../../import/services/import.service';
 import { ExportService } from '../../../export/services/export.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { environment } from '../../../../../environments/environment';
+import { ImportProgress } from '../../../import/models/import.model';
+import { ExportFormat } from '../../../export/models/export.model';
 
 // Components
 import { QuestionListComponent } from '../../components/question-list/question-list.component';
@@ -20,7 +25,7 @@ import { QuestionFormComponent } from '../../components/question-form/question-f
 import { CategoryListComponent } from '../../components/category-list/category-list.component';
 import { CategoryFormComponent } from '../../components/category-form/category-form.component';
 import { ExportButtonComponent } from '../../../export/components/export-button/export-button.component';
-import { FileUploadComponent } from '../../../import/components/file-upload/file-upload.component';
+import { FileUploadComponent, FileUploadEvent } from '../../../import/components/file-upload/file-upload.component';
 import { ImportProgressComponent } from '../../../import/components/import-progress/import-progress.component';
 
 @Component({
@@ -68,15 +73,7 @@ export class QuestionManagementPage implements OnInit {
 
   // Import
   readonly showImport = signal(false);
-  readonly importProgress = signal<{
-    sessionId: string;
-    status: 'pending' | 'processing' | 'completed' | 'failed';
-    total: number;
-    processed: number;
-    success: number;
-    failed: number;
-    errors: any[];
-  } | null>(null);
+  readonly importProgress = signal<ImportProgress | null>(null);
 
   // Loading states
   readonly isLoading = signal(false);
@@ -100,12 +97,12 @@ export class QuestionManagementPage implements OnInit {
     };
 
     this.questionService.getQuestions(filter).subscribe({
-      next: (response) => {
+      next: (response: QuestionListResponse) => {
         this.questions.set(response.data);
         this.totalQuestions.set(response.total);
         this.isLoading.set(false);
       },
-      error: (error) => {
+      error: (error: unknown) => {
         this.notificationService.error('Failed to load questions');
         this.isLoading.set(false);
       },
@@ -114,17 +111,17 @@ export class QuestionManagementPage implements OnInit {
 
   loadCategories(): void {
     this.questionService.getCategories(true).subscribe({
-      next: (categories) => {
+      next: (categories: Category[]) => {
         this.categories.set(categories);
       },
-      error: (error) => {
+      error: (error: unknown) => {
         this.notificationService.error('Failed to load categories');
       },
     });
   }
 
   onEditQuestion(id: string): void {
-    const question = this.questions().find((q) => q.id === id);
+    const question = this.questions().find((q: Question) => q.id === id);
     if (question) {
       this.editingQuestion.set(question);
       this.showQuestionForm.set(true);
@@ -138,7 +135,7 @@ export class QuestionManagementPage implements OnInit {
           this.notificationService.success('Question deleted');
           this.loadQuestions();
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.notificationService.error('Failed to delete question');
         },
       });
@@ -161,7 +158,7 @@ export class QuestionManagementPage implements OnInit {
           this.editingQuestion.set(undefined);
           this.loadQuestions();
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.notificationService.error('Failed to update question');
         },
       });
@@ -172,7 +169,7 @@ export class QuestionManagementPage implements OnInit {
           this.showQuestionForm.set(false);
           this.loadQuestions();
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.notificationService.error('Failed to create question');
         },
       });
@@ -192,7 +189,7 @@ export class QuestionManagementPage implements OnInit {
   }
 
   onDeleteCategory(id: string): void {
-    const category = this.categories().find((c) => c.id === id);
+    const category = this.categories().find((c: Category) => c.id === id);
     const questionCount = category?.question_count || 0;
 
     let message = 'Are you sure you want to delete this category?';
@@ -206,14 +203,14 @@ export class QuestionManagementPage implements OnInit {
           this.notificationService.success('Category deleted');
           this.loadCategories();
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.notificationService.error('Failed to delete category');
         },
       });
     }
   }
 
-  onCategorySubmit(dto: any): void {
+  onCategorySubmit(dto: CreateCategoryDto | UpdateCategoryDto): void {
     const editing = this.editingCategory();
 
     if (editing) {
@@ -224,7 +221,7 @@ export class QuestionManagementPage implements OnInit {
           this.editingCategory.set(undefined);
           this.loadCategories();
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.notificationService.error('Failed to update category');
         },
       });
@@ -235,7 +232,7 @@ export class QuestionManagementPage implements OnInit {
           this.showCategoryForm.set(false);
           this.loadCategories();
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.notificationService.error('Failed to create category');
         },
       });
@@ -271,18 +268,18 @@ export class QuestionManagementPage implements OnInit {
   // Import
 
   onToggleImport(): void {
-    this.showImport.update((show) => !show);
+    this.showImport.update((show: boolean) => !show);
   }
 
-  onFileUpload(event: any): void {
+  onFileUpload(event: FileUploadEvent): void {
     const file = event.file;
 
     this.importService.uploadFile(file).subscribe({
-      next: (response) => {
+      next: (response: { session_id: string }) => {
         this.notificationService.success('File uploaded, processing...');
         this.pollImportStatus(response.session_id);
       },
-      error: (error) => {
+      error: (error: unknown) => {
         this.notificationService.error('Failed to upload file');
       },
     });
@@ -290,8 +287,8 @@ export class QuestionManagementPage implements OnInit {
 
   private pollImportStatus(sessionId: string): void {
     this.importService.getImportStatus(sessionId).subscribe({
-      next: (progress) => {
-        this.importProgress.set(progress as any);
+      next: (progress: ImportProgress) => {
+        this.importProgress.set(progress);
 
         if (
           progress.status === 'completed' ||
@@ -313,7 +310,7 @@ export class QuestionManagementPage implements OnInit {
           setTimeout(() => this.pollImportStatus(sessionId), 1000);
         }
       },
-      error: (error) => {
+      error: (error: unknown) => {
         this.notificationService.error('Failed to get import status');
       },
     });
@@ -321,7 +318,7 @@ export class QuestionManagementPage implements OnInit {
 
   // Export
 
-  onExport(format: string): void {
+  onExport(format: ExportFormat): void {
     this.notificationService.info(`Exporting to ${format.toUpperCase()}...`);
 
     this.exportService
@@ -331,12 +328,12 @@ export class QuestionManagementPage implements OnInit {
         include_deleted: false,
       })
       .subscribe({
-        next: (blob) => {
+        next: (blob: Blob) => {
           const filename = this.exportService.generateFilename(format);
           this.exportService.downloadFile(blob, filename);
           this.notificationService.success('Export complete');
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.notificationService.error('Failed to export questions');
         },
       });

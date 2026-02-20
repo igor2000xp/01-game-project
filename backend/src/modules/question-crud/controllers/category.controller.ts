@@ -10,7 +10,12 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { CategoryService } from '../services/category.service';
-import { CategoryDto, CreateCategoryDto, UpdateCategoryDto, CategoryListWithCountDto } from '../dto/category.dto';
+import {
+  CategoryDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+  CategoryListWithCountDto,
+} from '../dto/category.dto';
 
 @Controller('categories')
 export class CategoryController {
@@ -22,7 +27,9 @@ export class CategoryController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createCategoryDto: CreateCategoryDto): Promise<CategoryDto> {
+  async create(
+    @Body() createCategoryDto: CreateCategoryDto,
+  ): Promise<CategoryDto> {
     return this.categoryService.create(createCategoryDto);
   }
 

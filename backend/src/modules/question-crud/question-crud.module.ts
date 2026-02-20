@@ -21,6 +21,11 @@ import { ExportService } from './services/export.service';
     CategoryRepository,
     ExportService,
   ],
-  exports: [QuestionService, CategoryService, QuestionRepository, CategoryRepository],
+  exports: [
+    QuestionService,
+    CategoryService,
+    QuestionRepository,
+    CategoryRepository,
+  ],
 })
 export class QuestionCrudModule {}

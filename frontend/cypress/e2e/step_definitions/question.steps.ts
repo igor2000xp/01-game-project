@@ -1,66 +1,96 @@
-import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor';
 
-Given('there are questions with text {string} and {string}', (text1: string, text2: string) => {
-  cy.intercept('GET', '/api/questions*', {
-    body: [
-      { id: 1, text: text1, categoryId: 1 },
-      { id: 2, text: text2, categoryId: 2 }
-    ]
-  }).as('getQuestions')
-})
+Given(
+  'the questions API returns items with {string} and {string}',
+  (first: string, second: string) => {
+    cy.intercept('GET', '**/api/questions*', {
+      data: [
+        {
+          id: 'q1',
+          text: first,
+          answer: 'A1',
+          category_id: 'cat-1',
+          type: 'open-ended',
+          difficulty: 'easy',
+          is_deleted: false,
+          created_at: '2024-01-01T00:00:00.000Z',
+          updated_at: '2024-01-01T00:00:00.000Z',
+        },
+        {
+          id: 'q2',
+          text: second,
+          answer: 'A2',
+          category_id: 'cat-1',
+          type: 'open-ended',
+          difficulty: 'easy',
+          is_deleted: false,
+          created_at: '2024-01-01T00:00:00.000Z',
+          updated_at: '2024-01-01T00:00:00.000Z',
+        },
+      ],
+      total: 2,
+      page: 1,
+      limit: 20,
+    }).as('searchQuestions');
+  }
+);
 
-Given('there is a question {string}', (questionText: string) => {
-  cy.intercept('GET', '/api/questions*', {
-    body: [
-      { id: 1, text: questionText, categoryId: 1 }
-    ]
-  }).as('getQuestions')
-})
+Given('categories are available for forms', () => {
+  cy.intercept('GET', '**/api/categories/with-counts*', {
+    data: [
+      {
+        id: 'cat-1',
+        name: 'Geography',
+        question_count: 2,
+        created_at: '2024-01-01',
+        updated_at: '2024-01-01',
+      },
+    ],
+  }).as('formCategories');
+});
 
-Given('there are multiple questions', () => {
-  cy.intercept('GET', '/api/questions*', {
-    body: [
-      { id: 1, text: 'Question 1', categoryId: 1 },
-      { id: 2, text: 'Question 2', categoryId: 2 }
-    ]
-  }).as('getQuestions')
-})
+Given('the browser confirm dialog is accepted', () => {
+  cy.on('window:confirm', () => true);
+});
 
-When('I click the {string} button', (buttonText: string) => {
-  cy.contains('button', buttonText).click()
-})
+When('I search for {string}', (term: string) => {
+  cy.get('[data-cy="search-input"]').clear().type(term);
+  cy.wait('@searchQuestions');
+});
 
-When('I fill in the question text with {string}', (text: string) => {
-  cy.get('[data-cy="question-text"]').type(text)
-})
+Then('only questions containing {string} are visible', (term: string) => {
+  cy.get('[data-cy="question-item"]').each(($row) => {
+    cy.wrap($row).should('contain.text', term);
+  });
+});
 
-When('I select the category {string}', (category: string) => {
-  cy.get('[data-cy="category-select"]').select(category)
-})
+When(
+  'I create a question with text {string} and answer {string}',
+  (text: string, answer: string) => {
+    cy.intercept('POST', '**/api/questions', {
+      id: 'q-new',
+      text,
+      answer,
+      type: 'open-ended',
+      is_deleted: false,
+      created_at: '2024-01-01T00:00:00.000Z',
+      updated_at: '2024-01-01T00:00:00.000Z',
+    }).as('createQuestion');
 
-When('I search for {string}', (searchTerm: string) => {
-  cy.get('[data-cy="search-input"]').clear().type(searchTerm)
-})
+    cy.contains('button', 'Add Question').click();
+    cy.get('[data-cy="question-text"]').type(text);
+    cy.get('#question-answer').type(answer);
+    cy.get('button[type="submit"]').contains('Create Question').click();
 
-Then('I should only see questions containing {string}', (searchTerm: string) => {
-  cy.get('[data-cy="question-item"]').each($item => {
-    cy.wrap($item).should('contain', searchTerm)
-  })
-})
+    cy.wait('@createQuestion');
+  }
+);
 
-When('I click the delete button for that question', () => {
-  cy.get('[data-cy="question-item"]').first().find('[data-cy="delete-button"]').click()
-})
+When('I delete the first question', () => {
+  cy.intercept('DELETE', '**/api/questions/*', { statusCode: 200, body: {} }).as(
+    'deleteQuestion'
+  );
 
-When('I select questions {string} and {string}', (question1: string, question2: string) => {
-  cy.get('[data-cy="question-item"]').contains(question1).find('[data-cy="select-checkbox"]').check()
-  cy.get('[data-cy="question-item"]').contains(question2).find('[data-cy="select-checkbox"]').check()
-})
-
-When('I confirm the deletion', () => {
-  cy.get('[data-cy="confirm-delete-button"]').click()
-})
-
-Then('both questions should be removed', () => {
-  cy.get('[data-cy="question-item"]').should('not.exist')
-})
+  cy.get('[data-cy="question-item"]').first().find('[data-cy="delete-button"]').click();
+  cy.wait('@deleteQuestion');
+});

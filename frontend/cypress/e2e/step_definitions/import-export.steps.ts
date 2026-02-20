@@ -1,50 +1,65 @@
-import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor';
 
-When('I click the export button', () => {
-  cy.get('[data-cy="export-button"]').click()
-})
+Given('export endpoint is stubbed for {string}', (format: string) => {
+  const mime = format.toLowerCase() === 'csv' ? 'text/csv' : 'application/json';
+  cy.intercept('POST', '**/api/questions/export', {
+    statusCode: 200,
+    headers: { 'content-type': mime },
+    body: format.toLowerCase() === 'csv' ? 'id,text\n1,Question' : '{"data":[]}',
+  }).as('exportQuestions');
+});
 
-When('I select {string} format', (format: string) => {
-  cy.contains(`[data-cy="format-option"]`, format).click()
-})
+When('I export questions as {string}', (format: string) => {
+  cy.get('[data-cy="export-button"]').click();
+  cy.contains('[data-cy="format-option"]', format.toUpperCase()).click();
+});
 
-Then('a {string} file should be downloaded', (extension: string) => {
-  cy.get('[data-cy="download-link"]').should('have.attr', 'href').and('include', `.${extension}`)
-})
+Then('an export request for {string} is sent', (format: string) => {
+  cy.wait('@exportQuestions')
+    .its('request.body')
+    .should('include', { format: format.toLowerCase() });
+});
 
-Then('the file should contain all questions', () => {
-  cy.get('[data-cy="download-link"]').should('exist')
-})
+Given('successful import endpoints are stubbed', () => {
+  cy.intercept('POST', '**/api/questions/import', {
+    statusCode: 200,
+    body: { session_id: 'session-123' },
+  }).as('uploadFile');
+  cy.intercept('GET', '**/api/questions/import/session-123/status', {
+    statusCode: 200,
+    body: {
+      sessionId: 'session-123',
+      status: 'completed',
+      total: 2,
+      processed: 2,
+      success: 2,
+      failed: 0,
+      errors: [],
+    },
+  }).as('importStatus');
+});
 
-When('I upload a valid CSV file', () => {
-  cy.intercept('POST', '/api/import', { statusCode: 200, body: { id: 'import-123', status: 'completed' } }).as('import')
-  cy.intercept('GET', '/api/import/import-123', { statusCode: 200, body: { status: 'completed', total: 2, processed: 2 } }).as('importStatus')
-  cy.get('[data-cy="file-upload"]').selectFile('cypress/fixtures/test-questions.csv')
-})
+Given('failed import upload endpoint is stubbed', () => {
+  cy.intercept('POST', '**/api/questions/import', {
+    statusCode: 400,
+    body: { message: 'Invalid file format' },
+  }).as('uploadFileError');
+});
 
-When('I upload a valid JSON file', () => {
-  cy.intercept('POST', '/api/import', { statusCode: 200, body: { id: 'import-123', status: 'completed' } }).as('import')
-  cy.get('[data-cy="file-upload"]').selectFile('cypress/fixtures/questions.json')
-})
+When('I upload file {string}', (fixtureFile: string) => {
+  cy.contains('button', 'Import').click();
+  cy.get('input[type="file"]').selectFile(`cypress/fixtures/${fixtureFile}`, { force: true });
 
-When('I upload an invalid file', () => {
-  cy.intercept('POST', '/api/import', { statusCode: 400, body: { error: 'Invalid file format' } }).as('importError')
-  cy.get('[data-cy="file-upload"]').selectFile('cypress/fixtures/invalid.txt')
-})
+  if (!fixtureFile.endsWith('.txt')) {
+    cy.wait('@uploadFile');
+    cy.wait('@importStatus');
+  }
+});
 
-Then('I should see import progress', () => {
-  cy.get('[data-cy="import-progress"]').should('be.visible')
-})
+Then('I see file validation error', () => {
+  cy.get('[data-cy="error-message"]').should('contain.text', 'CSV or JSON');
+});
 
-When('import completes I should see a success notification', () => {
-  cy.wait('@importStatus')
-  cy.get('[data-cy="notification"]').should('contain', 'success')
-})
-
-Then('the imported questions should appear in the list', () => {
-  cy.get('[data-cy="question-item"]').should('have.length.greaterThan', 0)
-})
-
-Then('no questions should be added', () => {
-  cy.get('[data-cy="question-item"]').should('not.exist')
-})
+Then('no import upload request is sent', () => {
+  cy.get('@uploadFileError.all').should('have.length', 0);
+});

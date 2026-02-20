@@ -1,17 +1,27 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CategoryRepository } from '../repositories/category.repository';
-import { CategoryDto, CreateCategoryDto, UpdateCategoryDto, CategoryWithCountDto, CategoryListWithCountDto } from '../dto/category.dto';
+import {
+  CategoryDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+  CategoryListWithCountDto,
+} from '../dto/category.dto';
+import { Category } from '../entities/category.entity';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    private categoryRepository: CategoryRepository,
-  ) {}
+  constructor(private categoryRepository: CategoryRepository) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<CategoryDto> {
     // Validate DTO
     if (!createCategoryDto.name || createCategoryDto.name.trim().length < 3) {
-      throw new BadRequestException('Category name must be at least 3 characters');
+      throw new BadRequestException(
+        'Category name must be at least 3 characters',
+      );
     }
 
     // Create category entity
@@ -27,14 +37,15 @@ export class CategoryService {
   async findAll(): Promise<CategoryDto[]> {
     const categories = await this.categoryRepository.findAll();
 
-    return categories.map(c => this.toDto(c));
+    return categories.map((c) => this.toDto(c));
   }
 
   async findAllWithCounts(): Promise<CategoryListWithCountDto> {
-    const categoriesWithCounts = await this.categoryRepository.findAllWithCounts();
+    const categoriesWithCounts =
+      await this.categoryRepository.findAllWithCounts();
 
     return {
-      data: categoriesWithCounts.map(c => ({
+      data: categoriesWithCounts.map((c) => ({
         id: c.id,
         name: c.name,
         created_at: new Date(c.created_at),
@@ -55,7 +66,10 @@ export class CategoryService {
     return this.toDto(category);
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto): Promise<CategoryDto> {
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<CategoryDto> {
     const category = await this.categoryRepository.findById(id);
 
     if (!category) {
@@ -64,7 +78,9 @@ export class CategoryService {
 
     if (updateCategoryDto.name !== undefined) {
       if (updateCategoryDto.name.trim().length < 3) {
-        throw new BadRequestException('Category name must be at least 3 characters');
+        throw new BadRequestException(
+          'Category name must be at least 3 characters',
+        );
       }
       category.name = updateCategoryDto.name;
     }
@@ -81,7 +97,7 @@ export class CategoryService {
   }
 
   // Helper methods
-  private toDto(category: any): CategoryDto {
+  private toDto(category: Category): CategoryDto {
     return {
       id: category.id,
       name: category.name,

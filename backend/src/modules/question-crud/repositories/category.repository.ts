@@ -36,7 +36,11 @@ export class CategoryRepository {
   async findAllWithCounts(): Promise<CategoryWithCount[]> {
     return this.categoryRepo
       .createQueryBuilder('category')
-      .leftJoin('category.questions', 'question', 'question.is_deleted = :isDeleted')
+      .leftJoin(
+        'category.questions',
+        'question',
+        'question.is_deleted = :isDeleted',
+      )
       .setParameter('isDeleted', false)
       .select([
         'category.id',
@@ -71,10 +75,17 @@ export class CategoryRepository {
     // Update questions to remove category_id reference
     const questions = await this.questionRepo.find({
       where: { category_id: id },
-      select: ['id', 'question_text', 'reference_answer', 'created_at', 'updated_at', 'is_deleted'],
+      select: [
+        'id',
+        'question_text',
+        'reference_answer',
+        'created_at',
+        'updated_at',
+        'is_deleted',
+      ],
     });
 
-    questions.forEach(q => {
+    questions.forEach((q) => {
       q.category_id = null;
       q.updated_at = new Date();
     });

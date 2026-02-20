@@ -19,8 +19,16 @@ describe('JsonParserService', () => {
 
   it('should parse valid JSON array correctly', async () => {
     const jsonData = JSON.stringify([
-      { question_text: 'What is the capital of France?', reference_answer: 'Paris', category: 'Geography' },
-      { question_text: 'What is 2+2?', reference_answer: 'Four', category: 'Math' },
+      {
+        question_text: 'What is the capital of France?',
+        reference_answer: 'Paris',
+        category: 'Geography',
+      },
+      {
+        question_text: 'What is 2+2?',
+        reference_answer: 'Four',
+        category: 'Math',
+      },
     ]);
     const stream = Readable.from(jsonData);
 
@@ -33,10 +41,15 @@ describe('JsonParserService', () => {
   });
 
   it('should throw error for non-array JSON', async () => {
-    const jsonData = JSON.stringify({ question_text: 'test', reference_answer: 'answer' });
+    const jsonData = JSON.stringify({
+      question_text: 'test',
+      reference_answer: 'answer',
+    });
     const stream = Readable.from(jsonData);
 
-    await expect(service.parseFile(stream)).rejects.toThrow('JSON must be an array');
+    await expect(service.parseFile(stream)).rejects.toThrow(
+      'JSON must be an array',
+    );
   });
 
   it('should throw error for invalid JSON', async () => {

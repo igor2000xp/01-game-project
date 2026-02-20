@@ -46,7 +46,9 @@ describe('ImportValidatorService', () => {
       const result = service.validateQuestionData(data, 1);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Column 'question_text' must be at least 10 characters");
+      expect(result.errors).toContain(
+        "Column 'question_text' must be at least 10 characters",
+      );
     });
 
     it('should fail when reference_answer is missing', () => {
@@ -67,7 +69,9 @@ describe('ImportValidatorService', () => {
       const result = service.validateQuestionData(data, 1);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Column 'reference_answer' must be at least 10 characters");
+      expect(result.errors).toContain(
+        "Column 'reference_answer' must be at least 10 characters",
+      );
     });
 
     it('should pass when category is valid', () => {
@@ -90,7 +94,9 @@ describe('ImportValidatorService', () => {
       const result = service.validateQuestionData(data, 1);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain("Column 'category' must be at least 3 characters");
+      expect(result.errors).toContain(
+        "Column 'category' must be at least 3 characters",
+      );
     });
   });
 
@@ -101,7 +107,9 @@ describe('ImportValidatorService', () => {
     });
 
     it('should return INVALID_FORMAT for type errors', () => {
-      const result = service.getErrorType("Column 'question_text' must be a string");
+      const result = service.getErrorType(
+        "Column 'question_text' must be a string",
+      );
       expect(result).toBe('INVALID_FORMAT');
     });
 

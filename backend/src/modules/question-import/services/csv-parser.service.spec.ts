@@ -18,7 +18,8 @@ describe('CsvParserService', () => {
   });
 
   it('should parse CSV data correctly', async () => {
-    const csvData = 'question_text,reference_answer,category\nWhat is the capital of France?,Paris,Geography\nWhat is 2+2?,Four,Math';
+    const csvData =
+      'question_text,reference_answer,category\nWhat is the capital of France?,Paris,Geography\nWhat is 2+2?,Four,Math';
     const stream = Readable.from(csvData);
 
     const result = await service.parseFile(stream);

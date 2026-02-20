@@ -7,6 +7,7 @@ import {
   HttpStatus,
   BadRequestException,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ExportService } from '../services/export.service';
 import { ExportRequestDto } from '../dto/export-request.dto';
 
@@ -20,7 +21,10 @@ export class ExportController {
    */
   @Post()
   @HttpCode(HttpStatus.OK)
-  async export(@Body() request: ExportRequestDto, @Res() res: any): Promise<void> {
+  async export(
+    @Body() request: ExportRequestDto,
+    @Res() res: Response,
+  ): Promise<void> {
     const result = await this.exportService.exportQuestions(request);
 
     if (!result.success) {
@@ -29,7 +33,10 @@ export class ExportController {
 
     // Set headers for file download
     res.setHeader('Content-Type', result.contentType);
-    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${result.filename}"`,
+    );
 
     // Send the content
     res.send(result.content);

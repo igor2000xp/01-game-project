@@ -1,6 +1,16 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, In } from 'typeorm';
+import {
+  Repository,
+  Like,
+  In,
+  FindOptionsWhere,
+  FindOptionsOrder,
+} from 'typeorm';
 import { Question } from '../entities/question.entity';
 import { Category } from '../entities/category.entity';
 import {
@@ -14,6 +24,7 @@ import {
   BulkDeleteResultDto,
 } from '../dto';
 import { DeleteMode } from '../dto/bulk-delete-questions.dto';
+import { SortBy } from '../entities/sort-by.vo';
 
 @Injectable()
 export class QuestionService {
@@ -26,11 +37,21 @@ export class QuestionService {
 
   async create(createQuestionDto: CreateQuestionDto): Promise<QuestionDto> {
     // Validate DTO
-    if (!createQuestionDto.question_text || createQuestionDto.question_text.trim().length < 10) {
-      throw new BadRequestException('Question text must be at least 10 characters');
+    if (
+      !createQuestionDto.question_text ||
+      createQuestionDto.question_text.trim().length < 10
+    ) {
+      throw new BadRequestException(
+        'Question text must be at least 10 characters',
+      );
     }
-    if (!createQuestionDto.reference_answer || createQuestionDto.reference_answer.trim().length < 10) {
-      throw new BadRequestException('Reference answer must be at least 10 characters');
+    if (
+      !createQuestionDto.reference_answer ||
+      createQuestionDto.reference_answer.trim().length < 10
+    ) {
+      throw new BadRequestException(
+        'Reference answer must be at least 10 characters',
+      );
     }
 
     // Create question entity
@@ -48,7 +69,9 @@ export class QuestionService {
         select: ['id', 'name'],
       });
       if (!category) {
-        throw new NotFoundException(`Category with ID ${createQuestionDto.category_id} not found`);
+        throw new NotFoundException(
+          `Category with ID ${createQuestionDto.category_id} not found`,
+        );
       }
       question.category_id = category.id;
     }
@@ -62,9 +85,9 @@ export class QuestionService {
     const page = queryDto.page || 1;
     const limit = queryDto.limit || 20;
     const offset = (page - 1) * limit;
-    const orderBy = queryDto.sort_by || 'created_at';
+    const orderBy = queryDto.sort_by ?? SortBy.CREATED_AT;
 
-    const where: any = { is_deleted: false };
+    const where: FindOptionsWhere<Question> = { is_deleted: false };
 
     if (queryDto.text) {
       where.question_text = Like(`%${queryDto.text}%`);
@@ -74,16 +97,27 @@ export class QuestionService {
       where.category_id = queryDto.category_id;
     }
 
+    const order: FindOptionsOrder<Question> = {
+      [orderBy]: 'ASC',
+    } as FindOptionsOrder<Question>;
     const [questions, total] = await this.questionRepository.findAndCount({
       where,
-      select: ['id', 'question_text', 'reference_answer', 'created_at', 'updated_at', 'category_id', 'is_deleted'],
-      order: { [orderBy]: 'ASC' },
+      select: [
+        'id',
+        'question_text',
+        'reference_answer',
+        'created_at',
+        'updated_at',
+        'category_id',
+        'is_deleted',
+      ],
+      order,
       skip: offset,
       take: limit,
     });
 
     return {
-      data: questions.map(q => this.toDto(q)),
+      data: questions.map((q) => this.toDto(q)),
       total,
       page,
       limit,
@@ -103,7 +137,10 @@ export class QuestionService {
     return this.toDto(question);
   }
 
-  async update(id: string, updateQuestionDto: UpdateQuestionDto): Promise<QuestionDto> {
+  async update(
+    id: string,
+    updateQuestionDto: UpdateQuestionDto,
+  ): Promise<QuestionDto> {
     const question = await this.questionRepository.findOne({
       where: { id, is_deleted: false },
     });
@@ -112,18 +149,22 @@ export class QuestionService {
       throw new NotFoundException(`Question with ID ${id} not found`);
     }
 
-    const updates: any = {};
+    const updates: Partial<Question> = {};
 
     if (updateQuestionDto.question_text !== undefined) {
       if (updateQuestionDto.question_text.trim().length < 10) {
-        throw new BadRequestException('Question text must be at least 10 characters');
+        throw new BadRequestException(
+          'Question text must be at least 10 characters',
+        );
       }
       updates.question_text = updateQuestionDto.question_text;
     }
 
     if (updateQuestionDto.reference_answer !== undefined) {
       if (updateQuestionDto.reference_answer.trim().length < 10) {
-        throw new BadRequestException('Reference answer must be at least 10 characters');
+        throw new BadRequestException(
+          'Reference answer must be at least 10 characters',
+        );
       }
       updates.reference_answer = updateQuestionDto.reference_answer;
     }
@@ -136,7 +177,9 @@ export class QuestionService {
         });
 
         if (!category) {
-          throw new NotFoundException(`Category with ID ${updateQuestionDto.category_id} not found`);
+          throw new NotFoundException(
+            `Category with ID ${updateQuestionDto.category_id} not found`,
+          );
         }
 
         updates.category_id = category.id;
@@ -187,14 +230,19 @@ export class QuestionService {
 
     await this.questionRepository.save(question);
 
-    return { success: true, message: 'Category removed from question successfully' };
+    return {
+      success: true,
+      message: 'Category removed from question successfully',
+    };
   }
 
-  async bulkDelete(bulkDeleteDto: BulkDeleteQuestionsDto): Promise<BulkDeleteResultDto> {
+  async bulkDelete(
+    bulkDeleteDto: BulkDeleteQuestionsDto,
+  ): Promise<BulkDeleteResultDto> {
     const { questionIds, category_id, mode } = bulkDeleteDto;
 
     // Build where clause
-    const where: any = {
+    const where: FindOptionsWhere<Question> = {
       id: In(questionIds),
       is_deleted: false,
     };
@@ -213,16 +261,18 @@ export class QuestionService {
       throw new NotFoundException('No questions found matching criteria');
     }
 
-    const idsToDelete = questions.map(q => q.id);
+    const idsToDelete = questions.map((q) => q.id);
 
     // Soft delete in transaction
-    await this.questionRepository.manager.transaction(async (transactionalEntityManager) => {
-      await transactionalEntityManager.softDelete(Question, {
-        where: {
-          id: In(idsToDelete),
-        },
-      });
-    });
+    await this.questionRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        await transactionalEntityManager.softDelete(Question, {
+          where: {
+            id: In(idsToDelete),
+          },
+        });
+      },
+    );
 
     return {
       deletedCount: idsToDelete.length,

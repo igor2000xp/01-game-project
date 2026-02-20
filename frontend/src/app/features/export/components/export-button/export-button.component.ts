@@ -18,7 +18,7 @@ export class ExportButtonComponent {
   ];
 
   toggleDropdown(): void {
-    this.isDropdownOpen.update((open) => !open);
+    this.isDropdownOpen.update((open: boolean) => !open);
   }
 
   onExport(format: ExportFormat): void {

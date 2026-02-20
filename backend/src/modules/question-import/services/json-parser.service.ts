@@ -7,6 +7,8 @@ export interface ParsedRecord {
   category?: string;
 }
 
+type JsonRecord = Record<string, unknown>;
+
 @Injectable()
 export class JsonParserService {
   async parseFile(fileStream: Readable): Promise<ParsedRecord[]> {
@@ -14,27 +16,42 @@ export class JsonParserService {
       let data = '';
 
       fileStream
-        .on('data', (chunk) => {
+        .on('data', (chunk: Buffer | string) => {
           data += chunk.toString();
         })
         .on('end', () => {
           try {
-            const records: any[] = JSON.parse(data);
+            const records = JSON.parse(data) as unknown;
             if (!Array.isArray(records)) {
               reject(new Error('JSON must be an array'));
               return;
             }
 
             // Map JSON records to expected structure
-            const mapped = records.map((record) => ({
-              question_text: record.question_text || record.question || '',
-              reference_answer: record.reference_answer || record.answer || '',
-              category: record.category,
+            const mapped = (records as JsonRecord[]).map((record) => ({
+              question_text:
+                typeof record.question_text === 'string'
+                  ? record.question_text
+                  : typeof record.question === 'string'
+                    ? record.question
+                    : '',
+              reference_answer:
+                typeof record.reference_answer === 'string'
+                  ? record.reference_answer
+                  : typeof record.answer === 'string'
+                    ? record.answer
+                    : '',
+              category:
+                typeof record.category === 'string'
+                  ? record.category
+                  : undefined,
             }));
 
             resolve(mapped);
-          } catch (error: any) {
-            reject(new Error(`Invalid JSON format: ${error.message}`));
+          } catch (error) {
+            const message =
+              error instanceof Error ? error.message : 'Unknown error';
+            reject(new Error(`Invalid JSON format: ${message}`));
           }
         })
         .on('error', reject);

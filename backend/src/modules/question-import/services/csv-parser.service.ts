@@ -8,6 +8,8 @@ export interface ParsedRecord {
   category?: string;
 }
 
+type CsvRow = Record<string, unknown>;
+
 @Injectable()
 export class CsvParserService {
   async parseFile(fileStream: Readable): Promise<ParsedRecord[]> {
@@ -16,12 +18,26 @@ export class CsvParserService {
 
       fileStream
         .pipe(parse({ headers: true, trim: true }))
-        .on('data', (row: any) => {
+        .on('data', (row: CsvRow) => {
+          const questionText =
+            typeof row.question_text === 'string'
+              ? row.question_text
+              : typeof row.question === 'string'
+                ? row.question
+                : '';
+          const referenceAnswer =
+            typeof row.reference_answer === 'string'
+              ? row.reference_answer
+              : typeof row.answer === 'string'
+                ? row.answer
+                : '';
+          const category =
+            typeof row.category === 'string' ? row.category : undefined;
           // Map CSV columns to expected structure
           records.push({
-            question_text: row.question_text || row.question || '',
-            reference_answer: row.reference_answer || row.answer || '',
-            category: row.category,
+            question_text: questionText,
+            reference_answer: referenceAnswer,
+            category,
           });
         })
         .on('end', () => resolve(records))

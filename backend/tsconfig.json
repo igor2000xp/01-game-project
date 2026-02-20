@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": true,
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
@@ -17,6 +18,8 @@
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": false,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "strictBindCallApply": true,

@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "typecheck": "npm --prefix frontend run typecheck && npm --prefix backend run typecheck"
+  },
   "dependencies": {
     "fs-extra": "^11.3.3",
     "glob": "^13.0.6",

@@ -1,6 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, Like } from 'typeorm';
+import {
+  Repository,
+  In,
+  Like,
+  FindOptionsWhere,
+  FindOptionsOrder,
+} from 'typeorm';
 import { Question } from '../entities/question.entity';
 import { Category } from '../entities/category.entity';
 import {
@@ -8,10 +14,10 @@ import {
   PaginatedQuestionListDto,
   QuestionDto,
   SuccessDto,
-  BulkDeleteQuestionsDto,
   DeleteMode,
   BulkDeleteResultDto,
 } from '../dto';
+import { SortBy } from '../entities/sort-by.vo';
 
 @Injectable()
 export class QuestionRepository {
@@ -29,7 +35,7 @@ export class QuestionRepository {
   async findAll(options: QuestionQueryDto): Promise<PaginatedQuestionListDto> {
     const { page = 1, limit = 20, text, category_id, sort_by } = options;
 
-    const where: any = { is_deleted: false };
+    const where: FindOptionsWhere<Question> = { is_deleted: false };
 
     if (text) {
       where.question_text = Like(`%${text}%`);
@@ -39,19 +45,30 @@ export class QuestionRepository {
       where.category_id = category_id;
     }
 
-    const orderBy = sort_by || 'created_at';
+    const orderBy = sort_by ?? SortBy.CREATED_AT;
     const skip = (page - 1) * limit;
 
+    const order: FindOptionsOrder<Question> = {
+      [orderBy]: 'ASC',
+    } as FindOptionsOrder<Question>;
     const [questions, total] = await this.questionRepo.findAndCount({
       where,
-      select: ['id', 'question_text', 'reference_answer', 'category_id', 'created_at', 'updated_at', 'is_deleted'],
-      order: { [orderBy]: 'ASC' },
+      select: [
+        'id',
+        'question_text',
+        'reference_answer',
+        'category_id',
+        'created_at',
+        'updated_at',
+        'is_deleted',
+      ],
+      order,
       skip,
       take: limit,
     });
 
     return {
-      data: questions.map(q => this.toDto(q)),
+      data: questions.map((q) => this.toDto(q)),
       total,
       page,
       limit,
@@ -67,7 +84,10 @@ export class QuestionRepository {
     return question ? this.toDto(question) : null;
   }
 
-  async update(id: string, data: Partial<Question>): Promise<QuestionDto | null> {
+  async update(
+    id: string,
+    data: Partial<Question>,
+  ): Promise<QuestionDto | null> {
     const question = await this.questionRepo.findOne({
       where: { id, is_deleted: false },
     });
@@ -76,7 +96,7 @@ export class QuestionRepository {
       throw new NotFoundException(`Question with ID ${id} not found`);
     }
 
-    const updates: any = {};
+    const updates: Partial<Question> = {};
     if (data.question_text) {
       updates.question_text = data.question_text;
     }
@@ -90,7 +110,9 @@ export class QuestionRepository {
       });
 
       if (!category) {
-        throw new NotFoundException(`Category with ID ${data.category_id} not found`);
+        throw new NotFoundException(
+          `Category with ID ${data.category_id} not found`,
+        );
       }
 
       updates.category_id = category.id;
@@ -155,7 +177,7 @@ export class QuestionRepository {
     category_id?: string;
     include_deleted?: boolean;
   }): Promise<Question[]> {
-    const where: any = {};
+    const where: FindOptionsWhere<Question> = {};
     if (options.category_id) {
       where.category_id = options.category_id;
     }
@@ -165,46 +187,58 @@ export class QuestionRepository {
 
     return this.questionRepo.find({
       where,
-      select: ['id', 'question_text', 'reference_answer', 'category_id', 'created_at', 'updated_at'],
+      select: [
+        'id',
+        'question_text',
+        'reference_answer',
+        'category_id',
+        'created_at',
+        'updated_at',
+      ],
       order: { created_at: 'ASC' },
     });
   }
 
-  async bulkSoftDelete(ids: string[], mode: DeleteMode): Promise<BulkDeleteResultDto> {
-    return await this.questionRepo.manager.transaction(async (transactionalEntityManager) => {
-      // Find all questions
-      const questions = await transactionalEntityManager.find(Question, {
-        where: {
-          id: In(ids),
-          is_deleted: false,
-        },
-        select: ['id', 'question_text', 'reference_answer', 'category_id'],
-      });
-
-      const idsToDelete = questions.map(q => q.id);
-
-      // Soft delete based on mode
-      if (mode === 'all') {
-        questions.forEach(q => {
-          q.is_deleted = true;
-          q.deleted_at = new Date();
+  async bulkSoftDelete(
+    ids: string[],
+    mode: DeleteMode,
+  ): Promise<BulkDeleteResultDto> {
+    return await this.questionRepo.manager.transaction(
+      async (transactionalEntityManager) => {
+        // Find all questions
+        const questions = await transactionalEntityManager.find(Question, {
+          where: {
+            id: In(ids),
+            is_deleted: false,
+          },
+          select: ['id', 'question_text', 'reference_answer', 'category_id'],
         });
-      } else if (mode === 'by-category') {
-        questions.forEach(q => {
-          q.is_deleted = true;
-          q.deleted_at = new Date();
-          q.category_id = null;
-        });
-      }
 
-      await transactionalEntityManager.save(questions);
+        const idsToDelete = questions.map((q) => q.id);
 
-      return {
-        deletedCount: idsToDelete.length,
-        success: true,
-        message: `${idsToDelete.length} questions deleted successfully`,
-      };
-    });
+        // Soft delete based on mode
+        if (mode === DeleteMode.ALL) {
+          questions.forEach((q) => {
+            q.is_deleted = true;
+            q.deleted_at = new Date();
+          });
+        } else if (mode === DeleteMode.BY_CATEGORY) {
+          questions.forEach((q) => {
+            q.is_deleted = true;
+            q.deleted_at = new Date();
+            q.category_id = null;
+          });
+        }
+
+        await transactionalEntityManager.save(questions);
+
+        return {
+          deletedCount: idsToDelete.length,
+          success: true,
+          message: `${idsToDelete.length} questions deleted successfully`,
+        };
+      },
+    );
   }
 
   private toDto(question: Question): QuestionDto {

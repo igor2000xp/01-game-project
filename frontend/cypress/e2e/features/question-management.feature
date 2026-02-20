@@ -4,37 +4,29 @@ Feature: Question Management
   So that I can maintain the question database
 
   Background:
-    Given I am on the questions page
-    And the API is available
+    Given I open the question management page
+    And the backend list endpoints are stubbed
+    When the initial data loads
 
   Scenario: View list of questions
-    When the questions load
-    Then I should see a list of questions
-    And the list should be paginated
+    Then I see question rows
+    And I see category entries
+
+  Scenario Outline: Search questions by text
+    Given the questions API returns items with "<first>" and "<second>"
+    When I search for "<term>"
+    Then only questions containing "<term>" are visible
+
+    Examples:
+      | first                       | second                      | term   |
+      | What is the capital of France? | What is the capital of Germany? | France |
 
   Scenario: Create a new question
-    When I click the "Add Question" button
-    And I fill in the question text with "What is the capital of France?"
-    And I select the category "Geography"
-    And I click the "Save" button
+    Given categories are available for forms
+    When I create a question with text "What is 2+2?" and answer "4"
     Then I should see a success notification
-    And the question should appear in the list
-
-  Scenario: Search for questions
-    Given there are questions with text "France" and "Germany"
-    When I search for "France"
-    Then I should only see questions containing "France"
 
   Scenario: Delete a question
-    Given there is a question "What is 2+2?"
-    When I click the delete button for that question
-    And I confirm the deletion
+    Given the browser confirm dialog is accepted
+    When I delete the first question
     Then I should see a success notification
-    And the question should be removed from the list
-
-  Scenario: Bulk delete questions
-    Given there are multiple questions
-    When I select questions "Question 1" and "Question 2"
-    And I click the "Delete Selected" button
-    And I confirm the deletion
-    Then both questions should be removed

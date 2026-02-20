@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing';
+import { describe, beforeEach, afterEach, it, expect, vi } from 'vitest';
 import { ExportService } from './export.service';
-import { environment } from '../../../../../environments/environment';
 
 describe('ExportService', () => {
   let service: ExportService;
@@ -12,7 +13,7 @@ describe('ExportService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      providers: [ExportService, provideHttpClient(), provideHttpClientTesting()],
     });
     service = TestBed.inject(ExportService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -20,37 +21,39 @@ describe('ExportService', () => {
 
   afterEach(() => {
     httpMock.verify();
+    vi.restoreAllMocks();
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+  it('posts export request and expects blob response', () => {
+    service.exportQuestions({ format: 'csv' }).subscribe();
 
-  it('should export questions as CSV', () => {
-    const request = { format: 'csv' };
-    service.exportQuestions(request as any).subscribe();
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/questions/export`);
+    const req = httpMock.expectOne('/questions/export');
     expect(req.request.method).toBe('POST');
+    expect(req.request.responseType).toBe('blob');
     req.flush(new Blob(['csv,data'], { type: 'text/csv' }));
   });
 
-  it('should export questions as JSON', () => {
-    const request = { format: 'json' };
-    service.exportQuestions(request as any).subscribe();
+  it('downloads blob using object URL and temporary anchor', () => {
+    const createObjectUrlSpy = vi
+      .spyOn(window.URL, 'createObjectURL')
+      .mockReturnValue('blob:mock');
+    const revokeSpy = vi.spyOn(window.URL, 'revokeObjectURL').mockImplementation(() => {});
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => {});
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/questions/export`);
-    expect(req.request.method).toBe('POST');
-    req.flush(new Blob(['json,data'], { type: 'application/json' }));
+    service.downloadFile(new Blob(['x']), 'file.csv');
+
+    expect(createObjectUrlSpy).toHaveBeenCalled();
+    expect(clickSpy).toHaveBeenCalled();
+    expect(revokeSpy).toHaveBeenCalledWith('blob:mock');
   });
 
-  it('should generate CSV filename', () => {
-    const filename = service.generateFilename('csv');
-    expect(filename).toMatch(/questions-export-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.csv/);
-  });
-
-  it('should generate JSON filename', () => {
+  it('generates timestamped filenames with selected format', () => {
     const filename = service.generateFilename('json');
-    expect(filename).toMatch(/questions-export-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json/);
+
+    expect(filename).toMatch(
+      /questions-export-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json/
+    );
   });
 });

@@ -1,13 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExportController } from './export.controller';
 import { ExportService } from '../services/export.service';
-import { ExportRequestDto } from '../dto/export-request.dto';
+import { ExportFormat } from '../dto/export-request.dto';
 import { BadRequestException } from '@nestjs/common';
+import { Response } from 'express';
 
 describe('ExportController', () => {
   let controller: ExportController;
-  let service: ExportService;
-  let responseMock: any;
+  let responseMock: { setHeader: jest.Mock; send: jest.Mock };
+  const exportQuestionsMock = jest.fn();
+  const generateFilenameMock = jest.fn();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -16,15 +18,14 @@ describe('ExportController', () => {
         {
           provide: ExportService,
           useValue: {
-            exportQuestions: jest.fn(),
-            generateFilename: jest.fn(),
+            exportQuestions: exportQuestionsMock,
+            generateFilename: generateFilenameMock,
           },
         },
       ],
     }).compile();
 
     controller = module.get<ExportController>(ExportController);
-    service = module.get(ExportService);
     responseMock = {
       setHeader: jest.fn(),
       send: jest.fn(),
@@ -39,7 +40,7 @@ describe('ExportController', () => {
 
   describe('POST /questions/export', () => {
     it('should export questions to CSV format', async () => {
-      const request = { format: 'csv' } as any;
+      const request = { format: ExportFormat.CSV };
       const csvResult = {
         success: true,
         format: 'csv',
@@ -50,18 +51,24 @@ describe('ExportController', () => {
         contentType: 'text/csv; charset=utf-8',
       };
 
-      (service.exportQuestions as jest.Mock).mockResolvedValue(csvResult);
+      exportQuestionsMock.mockResolvedValue(csvResult);
 
-      await controller.export(request, responseMock);
+      await controller.export(request, responseMock as unknown as Response);
 
-      expect(service.exportQuestions).toHaveBeenCalledWith(request);
-      expect(responseMock.setHeader).toHaveBeenCalledWith('Content-Type', 'text/csv; charset=utf-8');
-      expect(responseMock.setHeader).toHaveBeenCalledWith('Content-Disposition', 'attachment; filename="questions_2026-02-19.csv"');
+      expect(exportQuestionsMock).toHaveBeenCalledWith(request);
+      expect(responseMock.setHeader).toHaveBeenCalledWith(
+        'Content-Type',
+        'text/csv; charset=utf-8',
+      );
+      expect(responseMock.setHeader).toHaveBeenCalledWith(
+        'Content-Disposition',
+        'attachment; filename="questions_2026-02-19.csv"',
+      );
       expect(responseMock.send).toHaveBeenCalledWith('CSV content');
     });
 
     it('should export questions to JSON format', async () => {
-      const request = { format: 'json' } as any;
+      const request = { format: ExportFormat.JSON };
       const jsonResult = {
         success: true,
         format: 'json',
@@ -72,18 +79,24 @@ describe('ExportController', () => {
         contentType: 'application/json; charset=utf-8',
       };
 
-      (service.exportQuestions as jest.Mock).mockResolvedValue(jsonResult);
+      exportQuestionsMock.mockResolvedValue(jsonResult);
 
-      await controller.export(request, responseMock);
+      await controller.export(request, responseMock as unknown as Response);
 
-      expect(service.exportQuestions).toHaveBeenCalledWith(request);
-      expect(responseMock.setHeader).toHaveBeenCalledWith('Content-Type', 'application/json; charset=utf-8');
-      expect(responseMock.setHeader).toHaveBeenCalledWith('Content-Disposition', 'attachment; filename="questions_2026-02-19.json"');
+      expect(exportQuestionsMock).toHaveBeenCalledWith(request);
+      expect(responseMock.setHeader).toHaveBeenCalledWith(
+        'Content-Type',
+        'application/json; charset=utf-8',
+      );
+      expect(responseMock.setHeader).toHaveBeenCalledWith(
+        'Content-Disposition',
+        'attachment; filename="questions_2026-02-19.json"',
+      );
       expect(responseMock.send).toHaveBeenCalledWith('JSON content');
     });
 
     it('should throw BadRequestException for invalid format', async () => {
-      const request = { format: 'xml' } as any;
+      const request = { format: 'xml' } as { format: ExportFormat };
       const errorResult = {
         success: false,
         format: 'xml',
@@ -94,10 +107,10 @@ describe('ExportController', () => {
         contentType: 'text/xml',
       };
 
-      (service.exportQuestions as jest.Mock).mockResolvedValue(errorResult);
+      exportQuestionsMock.mockResolvedValue(errorResult);
 
       await expect(
-        controller.export(request, responseMock)
+        controller.export(request, responseMock as unknown as Response),
       ).rejects.toThrow(BadRequestException);
     });
   });

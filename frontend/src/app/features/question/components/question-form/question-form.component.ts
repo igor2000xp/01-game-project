@@ -80,43 +80,43 @@ export class QuestionFormComponent {
 
   onTextInput(event: Event): void {
     const input = event.target as HTMLTextAreaElement;
-    this.formData.update((f) => ({ ...f, text: input.value }));
+    this.formData.update((form: FormData) => ({ ...form, text: input.value }));
   }
 
   onAnswerInput(event: Event): void {
     const input = event.target as HTMLTextAreaElement;
-    this.formData.update((f) => ({ ...f, answer: input.value }));
+    this.formData.update((form: FormData) => ({ ...form, answer: input.value }));
   }
 
   onTypeSelect(event: Event): void {
     const select = event.target as HTMLSelectElement;
-    this.formData.update((f) => ({ ...f, type: select.value as QuestionType }));
+    this.formData.update((form: FormData) => ({ ...form, type: select.value as QuestionType }));
   }
 
   onDifficultySelect(event: Event): void {
     const select = event.target as HTMLSelectElement;
-    this.formData.update((f) => ({ ...f, difficulty: select.value as Difficulty }));
+    this.formData.update((form: FormData) => ({ ...form, difficulty: select.value as Difficulty }));
   }
 
   onCategorySelect(event: Event): void {
     const select = event.target as HTMLSelectElement;
-    this.formData.update((f) => ({ ...f, category_id: select.value }));
+    this.formData.update((form: FormData) => ({ ...form, category_id: select.value }));
   }
 
   onOptionInput(index: number, event: Event): void {
     const input = event.target as HTMLInputElement;
     const options = [...this.formData().options];
     options[index] = input.value;
-    this.formData.update((f) => ({ ...f, options }));
+    this.formData.update((form: FormData) => ({ ...form, options }));
   }
 
   addOption(): void {
-    this.formData.update((f) => ({ ...f, options: [...f.options, ''] }));
+    this.formData.update((form: FormData) => ({ ...form, options: [...form.options, ''] }));
   }
 
   removeOption(index: number): void {
-    const options = this.formData().options.filter((_, i) => i !== index);
-    this.formData.update((f) => ({ ...f, options }));
+    const options = this.formData().options.filter((option: string, i: number) => i !== index);
+    this.formData.update((form: FormData) => ({ ...form, options }));
   }
 
   onSubmit(): void {
@@ -145,7 +145,7 @@ export class QuestionFormComponent {
     }
 
     if (data.type === 'multiple-choice') {
-      const validOptions = data.options.filter((o) => o.trim().length > 0);
+      const validOptions = data.options.filter((option: string) => option.trim().length > 0);
       return validOptions.length >= 2;
     }
 

@@ -22,7 +22,7 @@ export class ImportProgressComponent {
 
   readonly statusText = computed(() => {
     const status = this.progress().status;
-    const statusMap = {
+    const statusMap: Record<ImportProgress['status'], string> = {
       pending: 'Pending',
       processing: 'Processing...',
       completed: 'Completed',

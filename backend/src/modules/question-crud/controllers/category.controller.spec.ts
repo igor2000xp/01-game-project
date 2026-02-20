@@ -1,11 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoryController } from './category.controller';
 import { CategoryService } from '../services/category.service';
-import { CategoryDto, CreateCategoryDto, UpdateCategoryDto, CategoryWithCountDto, CategoryListWithCountDto } from '../dto/category.dto';
+import {
+  CategoryDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+  CategoryListWithCountDto,
+} from '../dto/category.dto';
 
 describe('CategoryController', () => {
   let controller: CategoryController;
-  let service: CategoryService;
 
   const mockCategoryService = {
     create: jest.fn(),
@@ -28,8 +32,6 @@ describe('CategoryController', () => {
     }).compile();
 
     controller = module.get<CategoryController>(CategoryController);
-    service = module.get<CategoryService>(CategoryService);
-
     jest.clearAllMocks();
   });
 
@@ -55,7 +57,7 @@ describe('CategoryController', () => {
       const result = await controller.create(createDto);
 
       expect(result).toEqual(expected);
-      expect(service.create).toHaveBeenCalledWith(createDto);
+      expect(mockCategoryService.create).toHaveBeenCalledWith(createDto);
     });
   });
 
@@ -82,7 +84,7 @@ describe('CategoryController', () => {
 
       expect(result).toEqual(expected);
       expect(result).toHaveLength(2);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(mockCategoryService.findAll).toHaveBeenCalled();
     });
   });
 
@@ -116,7 +118,7 @@ describe('CategoryController', () => {
       expect(result.data).toHaveLength(2);
       expect(result.total).toBe(2);
       expect(result.data[0].question_count).toBe(15);
-      expect(service.findAllWithCounts).toHaveBeenCalled();
+      expect(mockCategoryService.findAllWithCounts).toHaveBeenCalled();
     });
 
     it('should handle empty category list', async () => {
@@ -150,7 +152,7 @@ describe('CategoryController', () => {
       const result = await controller.findOne(categoryId);
 
       expect(result).toEqual(expected);
-      expect(service.findOne).toHaveBeenCalledWith(categoryId);
+      expect(mockCategoryService.findOne).toHaveBeenCalledWith(categoryId);
     });
   });
 
@@ -174,7 +176,10 @@ describe('CategoryController', () => {
       const result = await controller.update(categoryId, updateDto);
 
       expect(result).toEqual(expected);
-      expect(service.update).toHaveBeenCalledWith(categoryId, updateDto);
+      expect(mockCategoryService.update).toHaveBeenCalledWith(
+        categoryId,
+        updateDto,
+      );
     });
   });
 
@@ -187,7 +192,7 @@ describe('CategoryController', () => {
       const result = await controller.delete(categoryId);
 
       expect(result).toBeUndefined();
-      expect(service.delete).toHaveBeenCalledWith(categoryId);
+      expect(mockCategoryService.delete).toHaveBeenCalledWith(categoryId);
     });
   });
 });

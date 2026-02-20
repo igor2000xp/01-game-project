@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus } from '@nestjs/common';
 import { QuestionController } from './question.controller';
 import { QuestionService } from '../services/question.service';
 import {
@@ -7,11 +6,12 @@ import {
   UpdateQuestionDto,
   QuestionDto,
   PaginatedQuestionListDto,
+  QuestionQueryDto,
 } from '../dto';
+import { SortBy } from '../entities/sort-by.vo';
 
 describe('QuestionController', () => {
   let controller: QuestionController;
-  let service: QuestionService;
 
   const mockQuestionService = {
     create: jest.fn(),
@@ -35,8 +35,6 @@ describe('QuestionController', () => {
     }).compile();
 
     controller = module.get<QuestionController>(QuestionController);
-    service = module.get<QuestionService>(QuestionService);
-
     jest.clearAllMocks();
   });
 
@@ -66,7 +64,7 @@ describe('QuestionController', () => {
       const result = await controller.create(createDto);
 
       expect(result).toEqual(expectedDto);
-      expect(service.create).toHaveBeenCalledWith(createDto);
+      expect(mockQuestionService.create).toHaveBeenCalledWith(createDto);
     });
   });
 
@@ -97,16 +95,16 @@ describe('QuestionController', () => {
       const result = await controller.findAll(query);
 
       expect(result).toEqual(expected);
-      expect(service.findAll).toHaveBeenCalledWith(query);
+      expect(mockQuestionService.findAll).toHaveBeenCalledWith(query);
     });
 
     it('should pass query parameters including filters', async () => {
-      const query = {
+      const query: QuestionQueryDto = {
         page: 1,
         limit: 10,
         text: 'search',
         category_id: 'cat-1',
-        sort_by: 'created_at' as const,
+        sort_by: SortBy.CREATED_AT,
       };
 
       const expected: PaginatedQuestionListDto = {
@@ -121,7 +119,7 @@ describe('QuestionController', () => {
 
       await controller.findAll(query);
 
-      expect(service.findAll).toHaveBeenCalledWith(query);
+      expect(mockQuestionService.findAll).toHaveBeenCalledWith(query);
     });
   });
 
@@ -144,7 +142,7 @@ describe('QuestionController', () => {
       const result = await controller.findOne(questionId);
 
       expect(result).toEqual(expected);
-      expect(service.findOne).toHaveBeenCalledWith(questionId);
+      expect(mockQuestionService.findOne).toHaveBeenCalledWith(questionId);
     });
   });
 
@@ -171,7 +169,10 @@ describe('QuestionController', () => {
       const result = await controller.update(questionId, updateDto);
 
       expect(result).toEqual(expected);
-      expect(service.update).toHaveBeenCalledWith(questionId, updateDto);
+      expect(mockQuestionService.update).toHaveBeenCalledWith(
+        questionId,
+        updateDto,
+      );
     });
   });
 
@@ -189,7 +190,7 @@ describe('QuestionController', () => {
       const result = await controller.delete(questionId);
 
       expect(result).toEqual(expected);
-      expect(service.delete).toHaveBeenCalledWith(questionId);
+      expect(mockQuestionService.delete).toHaveBeenCalledWith(questionId);
     });
   });
 });

@@ -1,44 +1,52 @@
 import { TestBed } from '@angular/core/testing';
+import { describe, beforeEach, afterEach, it, expect, vi } from 'vitest';
 import { NotificationService } from './notification.service';
 
 describe('NotificationService', () => {
   let service: NotificationService;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     TestBed.configureTestingModule({});
     service = TestBed.inject(NotificationService);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
-  it('should add success notification', () => {
-    service.success('Test message');
-    const notifications = service.notifications$();
-    expect(notifications.length).toBe(1);
-    expect(notifications[0].type).toBe('success');
-    expect(notifications[0].message).toBe('Test message');
+  it('adds success notifications', () => {
+    service.success('Saved');
+
+    expect(service.notifications$()).toHaveLength(1);
+    expect(service.notifications$()[0].type).toBe('success');
+    expect(service.notifications$()[0].message).toBe('Saved');
   });
 
-  it('should add error notification', () => {
-    service.error('Error message');
-    const notifications = service.notifications$();
-    expect(notifications[0].type).toBe('error');
+  it('auto-dismisses notifications when duration elapses', () => {
+    service.info('Info', 1000);
+    expect(service.notifications$()).toHaveLength(1);
+
+    vi.advanceTimersByTime(1000);
+    expect(service.notifications$()).toHaveLength(0);
   });
 
-  it('should dismiss notification by id', () => {
-    service.success('Test');
-    const notifications = service.notifications$();
-    const id = notifications[0].id;
-    service.dismiss(id);
-    expect(service.notifications$().length).toBe(0);
+  it('keeps notifications when duration is zero', () => {
+    service.warning('Persistent', 0);
+
+    vi.advanceTimersByTime(5000);
+    expect(service.notifications$()).toHaveLength(1);
   });
 
-  it('should dismiss all notifications', () => {
-    service.success('Test 1');
-    service.success('Test 2');
+  it('dismisses by id and dismisses all', () => {
+    service.success('A', 0);
+    service.error('B', 0);
+    const [first] = service.notifications$();
+
+    service.dismiss(first.id);
+    expect(service.notifications$()).toHaveLength(1);
+
     service.dismissAll();
-    expect(service.notifications$().length).toBe(0);
+    expect(service.notifications$()).toHaveLength(0);
   });
 });

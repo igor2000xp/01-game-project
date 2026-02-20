@@ -6,11 +6,7 @@ import { QuestionImportModule } from './modules/question-import/question-import.
 import { QuestionCrudModule } from './modules/question-crud/question-crud.module';
 
 @Module({
-  imports: [
-    DatabaseModule,
-    QuestionImportModule,
-    QuestionCrudModule,
-  ],
+  imports: [DatabaseModule, QuestionImportModule, QuestionCrudModule],
   controllers: [AppController],
   providers: [AppService],
 })

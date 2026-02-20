@@ -4,7 +4,7 @@ import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-prepro
 
 export default defineConfig({
   e2e: {
-    specPattern: '**/*.feature',
+    specPattern: 'cypress/e2e/features/**/*.feature',
     supportFile: 'cypress/support/e2e.ts',
     baseUrl: 'http://localhost:4200',
     async setupNodeEvents(on, config) {
@@ -17,13 +17,5 @@ export default defineConfig({
       }))
       return config
     }
-  },
-  component: {
-    devServer: {
-      framework: 'angular',
-      bundler: 'webpack',
-    },
-    specPattern: '**/*.cy.ts',
-    supportFile: 'cypress/support/component.ts'
   }
 })

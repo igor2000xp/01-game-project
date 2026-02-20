@@ -19,13 +19,13 @@ export class QuestionListComponent implements OnInit {
   delete = output<string>();
   pageChange = output<number>();
 
-  readonly questionTypes = {
+  readonly questionTypes: Record<Question['type'], string> = {
     'multiple-choice': 'MC',
     'open-ended': 'Open',
     'true-false': 'TF',
   };
 
-  readonly difficultyColors = {
+  readonly difficultyColors: Record<NonNullable<Question['difficulty']>, string> = {
     easy: '#28a745',
     medium: '#ffc107',
     hard: '#dc3545',
@@ -69,12 +69,21 @@ export class QuestionListComponent implements OnInit {
 
   getCategoryName(categoryId: string | undefined): string {
     if (!categoryId) return '-';
-    const category = this.categories().find((c) => c.id === categoryId);
+    const category = this.categories().find((category: Category) => category.id === categoryId);
     return category?.name || '-';
   }
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString();
+  }
+
+  getQuestionTypeLabel(type: Question['type']): string {
+    return this.questionTypes[type];
+  }
+
+  getDifficultyColor(difficulty?: Question['difficulty']): string {
+    const key = difficulty ?? 'medium';
+    return this.difficultyColors[key];
   }
 
   onPageChange(page: number | string): void {

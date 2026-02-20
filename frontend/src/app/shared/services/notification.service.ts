@@ -28,7 +28,7 @@ export class NotificationService {
       duration,
     };
 
-    this.notifications.update((current) => [...current, notification]);
+    this.notifications.update((current: Notification[]) => [...current, notification]);
 
     if (duration > 0) {
       setTimeout(() => {
@@ -54,8 +54,8 @@ export class NotificationService {
   }
 
   dismiss(id: string): void {
-    this.notifications.update((current) =>
-      current.filter((n) => n.id !== id)
+    this.notifications.update((current: Notification[]) =>
+      current.filter((n: Notification) => n.id !== id)
     );
   }
 

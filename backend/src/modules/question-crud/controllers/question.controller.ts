@@ -17,8 +17,6 @@ import {
   QuestionDto,
   PaginatedQuestionListDto,
   SuccessDto,
-  BulkDeleteQuestionsDto,
-  BulkDeleteResultDto,
 } from '../dto';
 import { QuestionService } from '../services/question.service';
 
@@ -32,7 +30,9 @@ export class QuestionController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createQuestionDto: CreateQuestionDto): Promise<QuestionDto> {
+  async create(
+    @Body() createQuestionDto: CreateQuestionDto,
+  ): Promise<QuestionDto> {
     return this.questionService.create(createQuestionDto);
   }
 
@@ -41,7 +41,9 @@ export class QuestionController {
    * GET /questions?page=1&limit=20&text=search&category_id=xxx&sort_by=created_at
    */
   @Get()
-  async findAll(@Query() queryDto: QuestionQueryDto): Promise<PaginatedQuestionListDto> {
+  async findAll(
+    @Query() queryDto: QuestionQueryDto,
+  ): Promise<PaginatedQuestionListDto> {
     return this.questionService.findAll(queryDto);
   }
 

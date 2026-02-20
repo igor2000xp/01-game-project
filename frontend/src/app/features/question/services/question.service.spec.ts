@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 import {
-  HttpClientTestingModule,
   HttpTestingController,
+  provideHttpClientTesting,
 } from '@angular/common/http/testing';
+import { describe, beforeEach, afterEach, it, expect } from 'vitest';
 import { QuestionService } from './question.service';
-import { environment } from '../../../../../environments/environment';
 
 describe('QuestionService', () => {
   let service: QuestionService;
@@ -12,8 +13,9 @@ describe('QuestionService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      providers: [QuestionService, provideHttpClient(), provideHttpClientTesting()],
     });
+
     service = TestBed.inject(QuestionService);
     httpMock = TestBed.inject(HttpTestingController);
   });
@@ -22,65 +24,57 @@ describe('QuestionService', () => {
     httpMock.verify();
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-
-  it('should get questions', () => {
+  it('gets paginated questions', () => {
     service.getQuestions({ page: 1, limit: 10 }).subscribe();
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/questions?page=1&limit=10`);
+    const req = httpMock.expectOne('/questions?page=1&limit=10');
     expect(req.request.method).toBe('GET');
     req.flush({ data: [], total: 0, page: 1, limit: 10 });
   });
 
-  it('should get single question', () => {
+  it('gets single question by id', () => {
     service.getQuestion('123').subscribe();
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/questions/123`);
+    const req = httpMock.expectOne('/questions/123');
     expect(req.request.method).toBe('GET');
-    req.flush({ id: '123', text: 'Test' });
+    req.flush({ id: '123', text: 'Test', answer: 'A', type: 'open-ended' });
   });
 
-  it('should create question', () => {
-    const dto = { text: 'Question', answer: 'Answer' };
-    service.createQuestion(dto as any).subscribe();
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/questions`);
+  it('creates and updates questions', () => {
+    service.createQuestion({ text: 'Q', answer: 'A', type: 'open-ended' }).subscribe();
+    let req = httpMock.expectOne('/questions');
     expect(req.request.method).toBe('POST');
-    req.flush({ id: '123', ...dto });
-  });
+    req.flush({ id: '1' });
 
-  it('should update question', () => {
-    const dto = { text: 'Updated' };
-    service.updateQuestion('123', dto as any).subscribe();
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/questions/123`);
+    service.updateQuestion('1', { text: 'Updated' }).subscribe();
+    req = httpMock.expectOne('/questions/1');
     expect(req.request.method).toBe('PUT');
-    req.flush({ id: '123', ...dto });
+    req.flush({ id: '1', text: 'Updated' });
   });
 
-  it('should delete question', () => {
-    service.deleteQuestion('123').subscribe();
+  it('deletes question and category', () => {
+    service.deleteQuestion('1').subscribe();
+    let req = httpMock.expectOne('/questions/1');
+    expect(req.request.method).toBe('DELETE');
+    req.flush({});
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/questions/123`);
+    service.deleteCategory('cat-1').subscribe();
+    req = httpMock.expectOne('/categories/cat-1');
     expect(req.request.method).toBe('DELETE');
     req.flush({});
   });
 
-  it('should get categories', () => {
+  it('gets category list and category counts', () => {
     service.getCategories().subscribe();
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/categories`);
+    let req = httpMock.expectOne('/categories');
     expect(req.request.method).toBe('GET');
     req.flush([]);
-  });
 
-  it('should get categories with counts', () => {
-    service.getCategories(true).subscribe();
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/categories/with-counts`);
+    service.getCategories(true).subscribe((categories) => {
+      expect(categories).toEqual([{ id: 'cat-1', name: 'Math', question_count: 3 }]);
+    });
+    req = httpMock.expectOne('/categories/with-counts');
     expect(req.request.method).toBe('GET');
-    req.flush({ data: [] });
+    req.flush({ data: [{ id: 'cat-1', name: 'Math', question_count: 3 }] });
   });
 });

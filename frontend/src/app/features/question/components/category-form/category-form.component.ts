@@ -1,6 +1,10 @@
 import { Component, input, output, signal, computed, effect } from '@angular/core';
 import { Category, CreateCategoryDto, UpdateCategoryDto } from '../../models/question.model';
 
+interface CategoryFormData {
+  name: string;
+}
+
 @Component({
   selector: 'app-category-form',
   standalone: true,
@@ -15,7 +19,7 @@ export class CategoryFormComponent {
 
   readonly isEditMode = computed(() => !!this.category());
 
-  readonly formData = signal({
+  readonly formData = signal<CategoryFormData>({
     name: '',
   });
 
@@ -36,7 +40,7 @@ export class CategoryFormComponent {
 
   onNameInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.formData.update((f) => ({ ...f, name: input.value }));
+    this.formData.update((form: CategoryFormData) => ({ ...form, name: input.value }));
   }
 
   onSubmit(): void {

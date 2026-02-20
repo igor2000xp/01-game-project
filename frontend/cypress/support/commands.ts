@@ -1,21 +1,15 @@
 declare global {
   namespace Cypress {
-    interface Chainable {
-      mountWithMocks: typeof mountWithMocks
-      clickByDataCy: typeof clickByDataCy
-      typeByDataCy: typeof typeByDataCy
-      verifyNotification: typeof verifyNotification
+    interface Chainable<Subject = any> {
+      clickByDataCy(selector: string): Chainable<Subject>
+      typeByDataCy(selector: string, text: string): Chainable<Subject>
+      verifyNotification(
+        type: 'success' | 'error' | 'warning' | 'info',
+        message?: string
+      ): Chainable<Subject>
     }
   }
 }
-
-Cypress.Commands.add('mountWithMocks', (component, mocks) => {
-  const providers = Object.entries(mocks).map(([token, mock]) => ({
-    provide: token,
-    useValue: mock
-  }))
-  return mount(component, { providers })
-})
 
 Cypress.Commands.add('clickByDataCy', (selector: string) => {
   cy.get(`[data-cy="${selector}"]`).click()

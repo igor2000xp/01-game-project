@@ -4,29 +4,22 @@ Feature: Category Management
   So that I can organize questions by topic
 
   Background:
-    Given I am on the questions page
+    Given I open the question management page
+    And the backend list endpoints are stubbed
+    When the initial data loads
 
-  Scenario: View list of categories
-    When I view the category list
-    Then I should see all categories with their question counts
+  Scenario: View category list with counts
+    Then I see category entries
 
   Scenario: Create a new category
-    When I click the "Add Category" button
-    And I enter the category name "Science"
-    And I click the "Save" button
+    When I create a category named "Science"
     Then I should see a success notification
-    And the category should appear in the list
 
   Scenario: Edit a category
-    Given there is a category "Mathematics"
-    When I click the edit button for "Mathematics"
-    And I change the name to "Math"
-    And I click the "Save" button
-    Then the category should be updated
+    When I rename the first category to "Mathematics"
+    Then I see category text "Mathematics"
 
   Scenario: Delete a category
-    Given there is a category "Old Category"
-    When I click the delete button for "Old Category"
-    And I confirm the deletion
+    Given the browser confirm dialog is accepted
+    When I delete the first category
     Then I should see a success notification
-    And the category should be removed

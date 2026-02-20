@@ -11,7 +11,10 @@ export class BulkDeleteQuestionsDto {
 
   @IsArray()
   @ArrayNotEmpty({ message: 'Must provide at least one question ID' })
-  @MinLength(1, { each: true, message: 'Question IDs must be at least 1 character' })
+  @MinLength(1, {
+    each: true,
+    message: 'Question IDs must be at least 1 character',
+  })
   questionIds: string[];
 
   category_id?: string;

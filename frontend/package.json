@@ -6,15 +6,18 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "typecheck": "npm run typecheck:app && npm run typecheck:cypress",
+    "typecheck:app": "tsc -p tsconfig.app.json --noEmit",
+    "typecheck:cypress": "tsc -p cypress/tsconfig.json --noEmit",
     "test": "vitest",
-    "test:unit": "vitest run",
+    "test:unit": "vitest run src/**/*.service.spec.ts src/**/*.interceptor.spec.ts",
+    "test:integration": "vitest run src/**/*.page.spec.ts",
+    "test:component": "vitest run src/**/*.component.spec.ts",
     "test:unit:watch": "vitest",
-    "test:component": "cypress run --component",
-    "test:component:watch": "cypress open --component",
     "test:e2e": "cypress run --e2e",
     "test:e2e:watch": "cypress open --e2e",
     "test:e2e:feature": "cypress run --e2e --spec 'cypress/e2e/features/**/*.feature'",
-    "test:all": "npm run test:unit && npm run test:component && npm run test:e2e"
+    "test:all": "npm run test:unit && npm run test:component && npm run test:integration && npm run test:e2e"
   },
   "prettier": {
     "printWidth": 100,
@@ -41,14 +44,21 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^21.1.4",
+    "@angular-devkit/core": "^21.1.4",
     "@angular/build": "^21.0.5",
     "@angular/cli": "^21.0.5",
     "@angular/compiler-cli": "^21.0.0",
+    "@angular/platform-browser-dynamic": "^21.1.5",
     "@badeball/cypress-cucumber-preprocessor": "^24.0.1",
+    "@cypress/angular": "^4.1.0",
     "@cypress/webpack-dev-server": "^5.6.0",
     "@cypress/webpack-preprocessor": "^7.0.2",
     "@percy/cypress": "^3.1.7",
     "cypress": "^15.10.0",
-    "typescript": "~5.9.2"
+    "jsdom": "^26.1.0",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.7",
+    "zone.js": "^0.16.1"
   }
 }

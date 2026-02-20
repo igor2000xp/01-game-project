@@ -21,14 +21,14 @@
             <td class="question-text">{{ question.text }}</td>
             <td>
               <span class="badge type-badge">
-                {{ questionTypes[question.type] }}
+                {{ getQuestionTypeLabel(question.type) }}
               </span>
             </td>
             <td>{{ getCategoryName(question.category_id) }}</td>
             <td>
               <span
                 class="badge difficulty-badge"
-                [style.background-color]="difficultyColors[question.difficulty || 'medium']"
+                [style.background-color]="getDifficultyColor(question.difficulty)"
               >
                 {{ question.difficulty || 'medium' }}
               </span>

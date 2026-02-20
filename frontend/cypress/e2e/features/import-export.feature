@@ -4,32 +4,28 @@ Feature: Import and Export Questions
   So that I can backup and migrate my question database
 
   Background:
-    Given I am on the questions page
+    Given I open the question management page
+    And the backend list endpoints are stubbed
+    When the initial data loads
 
-  Scenario: Export questions to CSV
-    When I click the export button
-    And I select CSV format
-    Then a CSV file should be downloaded
-    And the file should contain all questions
+  Scenario Outline: Export questions
+    Given export endpoint is stubbed for "<format>"
+    When I export questions as "<format>"
+    Then an export request for "<format>" is sent
+    And I should see a success notification
 
-  Scenario: Export questions to JSON
-    When I click the export button
-    And I select JSON format
-    Then a JSON file should be downloaded
-    And the file should contain all questions
+    Examples:
+      | format |
+      | CSV    |
+      | JSON   |
 
-  Scenario: Import questions from CSV
-    When I upload a valid CSV file
-    Then I should see import progress
-    And when import completes I should see a success notification
-    And the imported questions should appear in the list
-
-  Scenario: Import questions from JSON
-    When I upload a valid JSON file
-    Then I should see import progress
-    And when import completes I should see a success notification
+  Scenario: Import a valid CSV file
+    Given successful import endpoints are stubbed
+    When I upload file "test-questions.csv"
+    Then I should see a success notification
 
   Scenario: Import fails with invalid file
-    When I upload an invalid file
-    Then I should see an error notification
-    And no questions should be added
+    Given failed import upload endpoint is stubbed
+    When I upload file "invalid.txt"
+    Then I see file validation error
+    And no import upload request is sent

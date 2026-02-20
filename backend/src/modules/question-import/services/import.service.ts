@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, PayloadTooLargeException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  PayloadTooLargeException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -36,7 +40,10 @@ export class ImportService {
     private validator: ImportValidatorService,
   ) {}
 
-  async importQuestions(file: Express.Multer.File, mode: 'skip' | 'replace' = 'skip'): Promise<ImportResultDto> {
+  async importQuestions(
+    file: Express.Multer.File,
+    mode: 'skip' | 'replace' = 'skip',
+  ): Promise<ImportResultDto> {
     // File size validation
     if (file.size > MAX_FILE_SIZE) {
       throw new PayloadTooLargeException('File exceeds maximum size of 10MB');
@@ -60,9 +67,10 @@ export class ImportService {
     try {
       // Parse file
       const fileStream = Readable.from(file.buffer);
-      const records = fileType === 'CSV'
-        ? await this.csvParser.parseFile(fileStream)
-        : await this.jsonParser.parseFile(fileStream);
+      const records =
+        fileType === 'CSV'
+          ? await this.csvParser.parseFile(fileStream)
+          : await this.jsonParser.parseFile(fileStream);
 
       // Update session with total rows
       session.total_rows = records.length;
@@ -88,16 +96,18 @@ export class ImportService {
       session.status = ImportStatus.FAILED;
       await this.sessionRepository.save(session);
 
+      const message = error instanceof Error ? error.message : 'Unknown error';
+
       // Log critical error
       await this.errorRepository.save({
         id: uuidv4(),
         session_id: session.id,
         row_number: 0,
         error_type: ErrorType.UNKNOWN_ERROR,
-        message: error.message,
+        message,
       });
 
-      throw new BadRequestException(`Import failed: ${error.message}`);
+      throw new BadRequestException(`Import failed: ${message}`);
     }
   }
 

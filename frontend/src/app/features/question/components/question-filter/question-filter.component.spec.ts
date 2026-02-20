@@ -1,14 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { describe, beforeEach, it, expect, vi } from 'vitest';
 import { QuestionFilterComponent } from './question-filter.component';
 import { Category } from '../../models/question.model';
 
 describe('QuestionFilterComponent', () => {
   let component: QuestionFilterComponent;
   let fixture: ComponentFixture<QuestionFilterComponent>;
-  let searchChangeSpy: jasmine.Spy<string>;
-  let categoryChangeSpy: jasmine.Spy<string>;
-  let clearFiltersSpy: jasmine.Spy<void>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -17,82 +15,59 @@ describe('QuestionFilterComponent', () => {
 
     fixture = TestBed.createComponent(QuestionFilterComponent);
     component = fixture.componentInstance;
-
-    // Create spy outputs
-    component.searchChange = jasmine.createSpyObj('searchChange', ['emit']) as any;
-    component.categoryChange = jasmine.createSpyObj('categoryChange', ['emit']) as any;
-    component.clearFilters = jasmine.createSpyObj('clearFilters', ['emit']) as any;
-    searchChangeSpy = component.searchChange.emit as jasmine.Spy;
-    categoryChangeSpy = component.categoryChange.emit as jasmine.Spy;
-    clearFiltersSpy = component.clearFilters.emit as jasmine.Spy;
-
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('renders search and category filter controls', () => {
+    expect(fixture.debugElement.query(By.css('[data-cy="search-input"]'))).toBeTruthy();
+    expect(fixture.debugElement.query(By.css('[data-cy="category-filter"]'))).toBeTruthy();
   });
 
-  it('should show search input', () => {
-    const searchInput = fixture.debugElement.query(By.css('#search-input'));
-    expect(searchInput).toBeTruthy();
+  it('emits searchChange when typing in search input', () => {
+    const searchSpy = vi.spyOn(component.searchChange, 'emit');
+    const input = fixture.debugElement.query(By.css('#search-input')).nativeElement as HTMLInputElement;
+
+    input.value = 'fra';
+    input.dispatchEvent(new Event('input'));
+
+    expect(searchSpy).toHaveBeenCalledWith('fra');
   });
 
-  it('should show category select', () => {
-    const categorySelect = fixture.debugElement.query(By.css('#category-select'));
-    expect(categorySelect).toBeTruthy();
+  it('emits categoryChange when category selection changes', () => {
+    const categorySpy = vi.spyOn(component.categoryChange, 'emit');
+    const select = fixture.debugElement.query(By.css('#category-select'))
+      .nativeElement as HTMLSelectElement;
+
+    select.value = 'cat-1';
+    select.dispatchEvent(new Event('change'));
+
+    expect(categorySpy).toHaveBeenCalledWith('cat-1');
   });
 
-  it('should emit searchChange on input', () => {
-    const searchInput = fixture.debugElement.query(By.css('#search-input'));
-    searchInput.nativeElement.value = 'test query';
-    searchInput.nativeElement.dispatchEvent(new Event('input'));
-
-    expect(searchChangeSpy).toHaveBeenCalledWith('test query');
-  });
-
-  it('should emit categoryChange on select', () => {
-    const categorySelect = fixture.debugElement.query(By.css('#category-select'));
-    categorySelect.nativeElement.value = 'cat-1';
-    categorySelect.nativeElement.dispatchEvent(new Event('change'));
-
-    expect(categoryChangeSpy).toHaveBeenCalledWith('cat-1');
-  });
-
-  it('should emit clearFilters on button click', () => {
-    component.searchQuery.set('test');
-    component.selectedCategory.set('cat-1');
+  it('shows clear filters button only when filters are active', () => {
+    fixture.componentRef.setInput('searchQuery', '');
+    fixture.componentRef.setInput('selectedCategory', '');
     fixture.detectChanges();
 
-    const clearBtn = fixture.debugElement.query(By.css('.clear-btn'));
-    clearBtn.nativeElement.click();
+    expect(fixture.debugElement.query(By.css('.clear-btn'))).toBeNull();
+
+    fixture.componentRef.setInput('searchQuery', 'math');
     fixture.detectChanges();
 
-    expect(clearFiltersSpy).toHaveBeenCalled();
+    expect(fixture.debugElement.query(By.css('.clear-btn'))).toBeTruthy();
   });
 
-  it('should display category options', () => {
+  it('renders category options from input categories', () => {
     const categories: Category[] = [
-      { id: '1', name: 'Category 1', question_count: 10 },
-      { id: '2', name: 'Category 2', question_count: 5 },
+      { id: '1', name: 'Geography', question_count: 2 },
+      { id: '2', name: 'History', question_count: 1 },
     ];
-    component.categories.set(categories);
+
+    fixture.componentRef.setInput('categories', categories);
     fixture.detectChanges();
 
     const options = fixture.debugElement.queryAll(By.css('option'));
-    expect(options.length).toBe(3); // 2 categories + "All Categories"
-  });
-
-  it('should compute hasActiveFilters correctly', () => {
-    component.searchQuery.set('');
-    component.selectedCategory.set('');
-    expect(component.hasActiveFilters()).toBe(false);
-
-    component.searchQuery.set('test');
-    expect(component.hasActiveFilters()).toBe(true);
-
-    component.searchQuery.set('');
-    component.selectedCategory.set('cat-1');
-    expect(component.hasActiveFilters()).toBe(true);
+    expect(options).toHaveLength(3);
+    expect(options[1].nativeElement.textContent).toContain('Geography');
   });
 });

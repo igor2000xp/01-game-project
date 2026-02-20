@@ -53,7 +53,7 @@ export class QuestionService {
   getCategories(includeCounts = false): Observable<Category[]> {
     if (includeCounts) {
       return this.http.get<{ data: Category[] }>('/categories/with-counts').pipe(
-        map((response) => response.data)
+        map((response: { data: Category[] }) => response.data)
       );
     }
     return this.http.get<Category[]>('/categories');
